@@ -1,0 +1,40 @@
+{
+  "name": "@kuroshio/koishi-plugin-genshin",
+  "description": "genshin",
+  "version": "1.0.15",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "dist"
+  ],
+  "license": "MIT",
+  "scripts": {},
+  "keywords": [
+    "chatbot",
+    "koishi",
+    "plugin"
+  ],
+  "peerDependencies": {
+    "koishi": "^4.9.6"
+  },
+  "dependencies": {
+    "art-template": "^4.13.2",
+    "md5": "^2.3.0",
+    "moment": "^2.29.4",
+    "node-fetch": "2.6.7",
+    "node-schedule": "^2.1.1",
+    "oicq": "^2.3.1",
+    "yaml": "^2.2.1",
+    "image-size": "^1.0.2",
+    "puppeteer": "^19.7.2",
+    "redis": "^4.6.5",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "image-size": "^1.0.2",
+    "puppeteer": "^19.7.2",
+    "redis": "^4.6.5",
+    "lodash": "^4.17.21"
+  }
+}
