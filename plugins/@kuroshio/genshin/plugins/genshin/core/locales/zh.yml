@@ -1,0 +1,239 @@
+commands:
+  genshin.profile.calculator:
+    description: 人物养成计算器(需要绑定ck)
+    usage: |
+      指令用法
+      #[角色名]养成
+    examples: |
+      #胡桃养成
+    options:
+      id: 原神uid
+  genshin.help.calculatorhelp:
+    description: 人物养成计算器帮助
+    usage: |
+      指令用法
+      #角色养成帮助
+  genshin.help.blueprinthelp:
+    description: 尘歌壶养成帮助
+    usage: |
+      指令用法
+      #尘歌壶养成帮助
+  'genshin.profile.blueprint':
+    description: 尘歌壶摹本养成计算
+    usage: |
+      指令用法
+      #尘歌壶养成[id]
+    examples: |
+      例子
+      #尘歌壶模数21630998983
+    options:
+      id: 尘歌壶摹本id
+  'genshin.profile.note':
+    description: 原神体力查询
+    usage: |
+      指令用法
+      #体力
+  'genshin.wiki.getcode':
+    description: 查询直播兑换码
+    usage: |
+      指令用法
+      #直播兑换码
+  'genshin.profile.gclog':
+    description: 查询游戏抽卡记录
+    usage: |
+      指令用法
+      #[卡池类型]记录
+    examples: |
+      例子
+      #常驻记录
+      #角色记录
+      #武器记录
+  'genshin.help.gcloghelp':
+    description: 查询游戏抽卡记录帮助
+    usage: |
+      指令用法
+      #抽卡记录帮助
+  'genshin.profile.gachacount':
+    description: 游戏抽卡记录按角色统计
+    usage: |
+      指令用法
+      #[卡池类型]池统计
+    examples: |
+      例子
+      #常驻池统计
+      #角色池统计
+      #武器池统计
+  'genshin.profile.ledger':
+    description: 查询原神原石札记
+    usage: |
+      指令用法
+      #原石[月份]月
+    examples: |
+      例子
+      #原石
+      #原石1月
+    options:
+      month: 月份(数字)
+  'genshin.profile.ledgercount':
+    description: 查询原神原石统计
+    usage: |
+      指令用法
+      #原石统计
+  'genshin.wiki.material':
+    description: 查询游戏角色材料
+    usage: |
+      指令用法
+      #[角色名]材料
+    examples: |
+      例子
+      #胡桃材料
+    'genshin.profile.ledgercount':
+      description: 查询原神原石统计
+      usage: |
+        指令用法
+        #原石统计
+  'genshin.wiki.announce':
+    description: 查询游戏官方新闻
+    usage: |
+      指令用法
+      #官方[公告|资讯|活动][0-9]
+    examples: |
+      例子
+      #官方公告
+      #官方活动1
+      #官方资讯2
+  'genshin.mys.search':
+    description: 米游社搜索
+    usage: |
+      指令用法
+      #米游社[内容]
+    options:
+      content: 搜索内容
+  'genshin.wiki.budget':
+    description: 查询游戏当前版本可获取的原石
+    usage: |
+      指令用法
+      #原石预估
+  'genshin.profile.payrecord':
+    description: 统计游戏充值记录
+    usage: |
+      指令用法
+      #充值记录
+  'genshin.profile.payupdate':
+    description: 更新游戏充值记录
+    usage: |
+      指令用法
+      #更新充值记录
+  'genshin.help.payhelp':
+    description: 游戏充值记录帮助
+    usage: |
+      指令用法
+      #充值记录帮助
+  'genshin.profile.role':
+    description: 查询原神角色资料
+    usage: |
+      指令用法
+      #角色
+    options:
+      uid: 原神玩家uid
+  'genshin.profile.rolecard':
+    description: 查询原神角色卡片
+    usage: |
+      指令用法
+      #角色卡片
+  'genshin.profile.abyss':
+    description: 查询游戏深渊数据
+    usage: |
+      指令用法
+      #[上期|本期|往期]深渊[层数]
+    examples: |
+      例子
+      #深渊
+      #本期深渊
+      #上期深渊
+  'genshin.profile.abyssfloor':
+    description: 查询游戏深渊某层数据
+    usage: |
+      指令用法
+      #[上期|本期|往期]深渊[层数]
+    examples: |
+      例子
+      #本期深渊12层
+      #上期深渊11层
+  'genshin.profile.weapon':
+    description: 查询原神武器
+    usage: |
+      指令用法
+      #武器
+  'genshin.profile.rolebag':
+    description: 查询游戏角色
+    usage: |
+      指令用法
+      #[5星|五星|4星|四星]角色
+    examples: |
+      例子
+      #五星角色
+      #4星角色
+  'genshin.profile.rolelist':
+    description: 查询游戏角色练度
+    usage: |
+      指令用法
+      #练度统计
+  'genshin.profile.explore':
+    description: 查询游戏角色探索度
+    usage: |
+      指令用法
+      #探索
+  'genshin.wiki.strategy':
+    description: 查询游戏角色攻略
+    usage: |
+      指令用法
+      #[角色名]攻略[1-4]
+      例子
+      #胡桃攻略
+      #神里攻略2
+  'genshin.help.strategy':
+    description: 查询游戏角色攻略帮助
+    usage: |
+      指令用法
+      #攻略帮助
+  'genshin.profile.today':
+    description: 查询原神今日素材
+    usage: |
+      指令用法
+      #今日素材
+  'genshin.help.ck':
+    description: 绑定ck帮助
+    usage: |
+      指令用法
+      #ck帮助
+  'genshin.user.myck':
+    description: 查询绑定的ck
+    usage: |
+      指令用法
+      #我的ck
+  'genshin.user.chekcck':
+    description: 查询绑定的ck的状态
+    usage: |
+      指令用法
+      #ck状态
+  'genshin.user.delck':
+    description: 删除绑定的ck
+    usage: |
+      指令用法
+      #删除ck
+  'genshin.user.myuid':
+    description: 查询和切换绑定uid
+    usage: |
+      指令用法
+      #uid[uid序号]
+    examples: |
+      例子
+      #uid
+      #uid1
+      #uid2
+  'genshin.user.binguid':
+    description: 绑定uid
+    usage: |
+      指令用法
+      #绑定uid

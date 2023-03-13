@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <link rel="shortcut icon" href="#" />
+    <!-- <link rel="stylesheet" type="text/css" href="./enkaNetwork.css" /> -->
+    <link rel="stylesheet" type="text/css" href="{{pluResPath}}html/enkaNetwork/enka.css" />
+    <!-- <link rel="preload" href="{{resPath}}/font/tttgbnumber.ttf" as="font">
+    <link rel="preload" href="{{pluResPath}}img/other/bg5.png" as="image">
+    <link rel="preload" href="{{pluResPath}}img/other/bg4.png" as="image">
+    <link rel="preload" href="{{pluResPath}}img/other/bg105.png" as="image">
+    <link rel="preload" href="{{pluResPath}}img/abyss/bg.png" as="image"> -->
+  </head>
+  <body>
+    <div class="container" id="container">
+      <div class = "cardBox">
+        <div style="position: absolute;width: 100%;height: 100%;" class="{{roleData.element}}"></div>
+        <div class="roleImgDiv">
+          <img class="roleImage" src='{{pluResPath}}img/enkaNetwork/role/{{roleData.avatarId}}.png' />
+        </div>
+        <div class="roleBaseInfoBox roleInfo">
+          <div class="name">
+            <b>{{roleData.avatarName}}</b>
+            <span class="svelt-ps4631">&nbsp;&nbsp;▴&nbsp;&nbsp;{{roleData.playerName}}</span>
+          </div>
+          <div class="level">
+            等级{{roleData.avatarLevel}}/
+            <span class="svelt-ps4631" style="opacity: 0.6;">90</span>
+          </div>
+          <div class="fren svelte-ps463l">
+            ❤ {{roleData.fetterInfo.expLevel}}
+          </div>
+        </div>
+        <div class="mingZuo">
+          {{each roleData.talents val index}}
+          <div class="mingZuoBox mingZuoBorder {{roleData.element}}b">
+            {{if roleData.talentSize > index}}
+            <img src="{{cwd}}/data/enkaNetwork/cache/icon/{{val.icon}}.png" class="mingZuoIcon" />
+            {{else}}
+            <img src="{{pluResPath}}img/enkaNetwork/lock.png" class="mingZuoIcon" />
+            {{/if}}
+          </div>
+          {{/each}}
+        </div>
+        <div class="skillBox">
+          <div>
+            <div class="normal-atk mingZuoBorder {{roleData.element}}b"></div>
+            <img src="{{cwd}}/data/enkaNetwork/cache/icon/{{roleData.skillLevelMap.a.icon}}.png" class="normal-atk" />
+            <div class="normal-atk-level level-wrap">
+              <span class="skillLevel {{roleData.skillLevelMap.a.exLvl?" skillMaxLevel":""}}">{{roleData.skillLevelMap.a.level + roleData.skillLevelMap.a.exLvl}}</span>
+            </div>
+          </div>
+          <div>
+            <div class="e-atk mingZuoBorder {{roleData.element}}b"></div>
+            <img src="{{cwd}}/data/enkaNetwork/cache/icon/{{roleData.skillLevelMap.e.icon}}.png" class="e-atk" />
+            <div class="e-atk-level level-wrap">
+              <span class="skillLevel{{roleData.skillLevelMap.e.exLvl?" skillMaxLevel":""}}">{{roleData.skillLevelMap.e.level + roleData.skillLevelMap.e.exLvl}}</span>
+            </div>
+          </div>
+          <div>
+            <div class="q-atk mingZuoBorder {{roleData.element}}b"></div>
+            <img src="{{cwd}}/data/enkaNetwork/cache/icon/{{roleData.skillLevelMap.q.icon}}.png" class="q-atk" />
+            <div class="q-atk-level level-wrap">
+              <span class="skillLevel{{roleData.skillLevelMap.q.exLvl?" skillMaxLevel":""}}">{{roleData.skillLevelMap.q.level + roleData.skillLevelMap.q.exLvl}}</span>
+            </div>
+          </div>
+        </div>
+        <span class="uid name">
+          {{uid}}
+        </span>
+        <div class="rollDetail roleInfo">
+          <div class="weapon svelte-gp6viv">
+            <figure class="svelte-gp6viv">
+              <img src="{{cwd}}/data/enkaNetwork/cache/icon/{{roleData.weaponData.icon}}.png" class="WeaponIcon svelte-gp6viv" />
+              <div class="Stars svelte-ghazry" style="text-align: center;">
+                {{each roleData.weaponData.rankLvlArray}}
+                <span class="svelte-ghazry">★</span>
+                {{/each}}
+              </div>
+            </figure>
+            <content class="content">
+              <h3 class="weaponName">
+                <b>{{roleData.weaponData.name}}</b>
+              </h3>
+              <div class="weaponData svelte-gp6viv">
+                {{each roleData.weaponData.weaponStats val}}
+                <div class="Substat ATTACK">
+                  <span>{{val.appendPropName}}</span>
+                  <span>{{val.statValue}}</span>
+                </div>
+                {{/each}}
+              </div>
+              <div>
+                <div class="refine">
+                  精炼{{roleData.weaponData.affix}}
+                </div>
+                <div class="level svelte-gp6viv">
+                  等级 {{roleData.weaponData.level}}/<span style="opacity: 0.6;">90</span>
+                </div>
+              </div>
+            </content>
+          </div>
+          <div class="StatsTable svelte-1ujofp1">
+            {{each roleData.showProp val}}
+            <div class="row svelte-1ujofp1">
+              <div class="mid svelte-1ujofp1">
+                <span class="svelte-1ujofp1">
+                  <b>{{val.name}}</b>
+                </span>
+                <span class="sep svelte-1ujofp1"></span>
+                <span class="svelte-1ujofp1"><b>{{val.sum}}</b></span>
+              </div>
+              {{if val.white}}
+              <div class="row small svelte-1ujofp1">
+                <div class="mid svelte-1ujofp1">
+                  <span class="sep"></span>
+                  <span class="svelte-1ujofp1">
+                    {{val.white}}
+                    <span class="svelte-1ujofp1 addition">
+                      +{{val.green}}
+                    </span>
+                  </span>
+                </div>
+              </div>
+              {{/if}}
+            </div>
+            {{/each}}
+            <div class="Effect svelte-1ujofp1">
+              <div class="sets svelte-1ujofp1">
+                <div class="svelte-1ujofp1">
+                  <div class="desc svelte-1ujofp1">
+                    <b>辰砂往生录</b>
+                  </div>
+                  <div class="count svelte-1ujofp1">2</div>
+                </div>
+                <div class="svelte-1ujofp1">
+                  <div class="desc svelte-1ujofp1">
+                    <b>昔日宗室之仪</b>
+                  </div>
+                  <div class="count svelte-1ujofp1">2</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="section right svelte-ps463l">
+          {{each roleData.artifacts val}}
+          <div class="Artifact svelte-17qi811">
+            <img src="{{cwd}}/data/enkaNetwork/cache/icon/{{val.icon}}.png" class="ArtifactIcon"/>
+            <div class="mainstat HP svelte-17qi811" >
+              <div class="ShadedSvgIcon svelte-10u2dlf">
+                <span><b>{{val.mainPropName}}</b></span>
+              </div>
+            </div>
+            <div class="mainVal"><b>{{val.mainPropVal}}</b></div>
+            <div class="StarsLevel">
+              <div class="Stars svelte-ghazry">
+                {{each val.starLevelArray}}
+                <span class="svelte-ghazry">★</span>
+                {{/each}}
+              </div>
+              <div class="level StarsLevel">+{{val.level}}</div>
+            </div>
+            <hr class="svelte-17qi811"/>
+            <div class="substats svelte-17qi811">
+              {{each val.subProps subProp}}
+              <div class="Substat svelte-1ut2kb8">
+                <span class="svelte-1ut2kb8">{{subProp.name}}+{{subProp.val}}</span>
+              </div>
+              {{/each}}
+            </div>
+          </div>
+          {{/each}}
+        </div>
+        <span class="updateTime">最后更新时间{{updateTime}}</span>
+        <span class="readMe">Create By Yunzai | 技术支持 Enka.Network</span>
+      </div>
+    </div>
+  </body>
+  <script type="text/javascript">
+    function whenError(a, type) {
+      // a.onerror = null;
+      // a.src = "{{pluResPath}}img/" + type + "/荧.png";
+    }
+  </script>
+</html>

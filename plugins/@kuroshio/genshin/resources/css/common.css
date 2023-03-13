@@ -1,0 +1,11 @@
+.head_box {
+    font-family: "tttgbnumber";
+  }
+  
+  .head_box .lable {
+    font-size: 36px;
+    position: relative;
+    bottom: -18rem;
+    left: 5rem;
+    color: white;
+  }

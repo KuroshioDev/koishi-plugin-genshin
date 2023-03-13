@@ -1,0 +1,8 @@
+# 公共查询是否使用用户ck  0-不使用 1-使用
+allowUseCookie: 0
+# 默认cookie帮助文档链接地址
+cookieDoc: docs.qq.com/doc/DUWNVQVFTU3liTVlO
+# 米游社原神签到定时任务，Cron表达式，默认00:02开始执行，每10s签到一个
+signTime: 0 2 0 * * ?
+#别名设置权限 0-所有群员都可以添加 1-群管理员才能添加 2-主人才能添加
+abbrSetAuth: 0

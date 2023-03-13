@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="515"
+   height="596"
+   viewBox="0 0 136.26041 157.69167"
+   version="1.1"
+   id="svg1721"
+   sodipodi:docname="Shade.svg"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1723"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     units="px"
+     inkscape:snap-global="true"
+     inkscape:snap-bbox="true"
+     inkscape:bbox-paths="true"
+     inkscape:bbox-nodes="true"
+     inkscape:snap-bbox-edge-midpoints="true"
+     inkscape:snap-bbox-midpoints="true"
+     inkscape:snap-page="true"
+     inkscape:snap-text-baseline="true"
+     inkscape:snap-center="true"
+     inkscape:snap-object-midpoints="true"
+     inkscape:snap-midpoints="true"
+     inkscape:snap-smooth-nodes="true"
+     inkscape:snap-intersection-paths="true"
+     inkscape:object-paths="true"
+     inkscape:zoom="0.81134749"
+     inkscape:cx="454.18271"
+     inkscape:cy="480.06557"
+     inkscape:window-width="2560"
+     inkscape:window-height="1377"
+     inkscape:window-x="-10"
+     inkscape:window-y="-10"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1718">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter3649"
+       x="-0.14269025"
+       y="-0.12405674"
+       width="1.2853805"
+       height="1.2481135">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="11.947533"
+         id="feGaussianBlur3651" />
+    </filter>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath4572">
+      <rect
+         style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.02;paint-order:stroke markers fill"
+         id="rect4574"
+         width="136.26042"
+         height="157.69167"
+         x="0"
+         y="0" />
+    </clipPath>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="opacity:1;mix-blend-mode:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.214241px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3649)"
+       d="M 23.900903,133.25353 C 6.1431091,109.12555 10.414318,49.44091 38.901669,23.501332 62.721462,-0.75625855 157.41223,-35.530642 181.5439,-46.292061 L -19.409419,-26.260354 V 184.84475 L 145.16805,183.86644 C 128.53677,177.67048 46.207033,156.9173 23.900903,133.25353 Z"
+       id="path1815"
+       sodipodi:nodetypes="ccccccc"
+       clip-path="url(#clipPath4572)" />
+  </g>
+</svg>
