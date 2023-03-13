@@ -21,7 +21,7 @@
 ## ✨ 功能
 
 - [x] 云仔主体
-- [ ] js template (用于云仔插件开发)
+- [x] js template (用于云仔插件开发)
 - [x] csv-逍遥插件 （完成等release）
 - [x] 喵喵插件 （完成等release）
 
