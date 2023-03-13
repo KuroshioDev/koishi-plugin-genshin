@@ -60,6 +60,7 @@ yarn start
 
 4. 开启插件
 
+<img src="https://github.com/KuroshioDev/koishi-plugin-genshin/blob/develop/%E6%95%99%E7%A8%8B.png?raw=true">
 
 ## 🌈 其他
 
