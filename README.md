@@ -40,7 +40,26 @@
 
 ##  :tw-2049: 开发指南
 
-// todo
+1. 下载代码
+```
+git clone https://github.com/KuroshioDev/koishi-plugin-genshin.git
+```
+
+2. 安装依赖
+
+```
+cd koishi-plugin-genshin
+yarn
+```
+
+3. 运行
+
+```
+yarn start
+```
+
+4. 开启插件
+
 
 ## 🌈 其他
 
