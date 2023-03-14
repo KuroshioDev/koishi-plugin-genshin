@@ -74,7 +74,7 @@ yarn start
 
 | 开发群 | QQ频道 | Discord | Telegram | 爱发电 |
 |-----|------|---------|----------|-----|
-|  <img width="200" src="https://gitee.com/KuroshioDev/koishi-plugin-genshin/raw/master/dev.jpg">   |  <img width="200" src="https://gitee.com/KuroshioDev/koishi-plugin-genshin/raw/master/qqguild.jpg">    |  https://discord.gg/uJpcadmrpa       |   <img width="200" src="https://github.com/KuroshioDev/koishi-plugin-genshin/blob/master/telegram.jpg?raw=true">       |  <img width="200" src="https://gitee.com/KuroshioDev/koishi-plugin-genshin/raw/master/love.jpeg">   |
+|  <img width="200" src="https://gitee.com/KuroshioDev/koishi-plugin-genshin/raw/master/dev.jpg">   |  <img width="200" src="https://gitee.com/KuroshioDev/koishi-plugin-genshin/raw/master/qqguild.jpg">    |  https://discord.gg/uJpcadmrpa       |   <img width="200" src="https://github.com/KuroshioDev/koishi-plugin-genshin/blob/develop/telegram.jpg?raw=true">       |  <img width="200" src="https://gitee.com/KuroshioDev/koishi-plugin-genshin/raw/master/love.jpeg">   |
 
 
 
