@@ -21,9 +21,9 @@
 ## ✨ 功能
 
 - [x] 云仔主体
-- [x] js template (用于云仔插件开发)
-- [x] csv-逍遥插件 （完成等release）
-- [x] 喵喵插件 （完成等release）
+- [x] example 插件
+- [x] [csv-逍遥插件](https://github.com/KuroshioDev/kuroshio-xiaoyao-plugin)
+- [x] [喵喵插件](https://github.com/KuroshioDev/kuroshio-miao-plugin)
 
 
 
