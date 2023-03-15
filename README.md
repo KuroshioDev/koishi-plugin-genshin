@@ -31,14 +31,7 @@
 
 - [koishi](https://koishi.chat/)
 
-## 📦 安装与更新
-
-1. 安装koishi
-2. 安装redis
-2. 插件市场搜索 @Kuroshio/genshin， 选择需要的版本
-3. 配置插件就可
-
-## 🔅 开发指南
+## 📦 安装指南
 
 1. 安装前准备
 
