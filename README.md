@@ -40,27 +40,43 @@
 
 ##  :tw-2049: 开发指南
 
-1. 下载代码
-```
-git clone https://github.com/KuroshioDev/koishi-plugin-genshin.git
-```
+1. 安装前准备
+
+- 安装git
+ubuntu下
+  ```
+    apt install git
+  ```
+- 安装redis
+
+      待补充
+
+- 安装yarn
+  ```
+  npm install yarn -g
+  ```
+
+2. 下载代码
+    ```
+    git clone https://github.com/KuroshioDev/koishi-plugin-genshin.git
+    ```
 
 2. 安装依赖
 
-```
-cd koishi-plugin-genshin
-yarn
-```
+    ```
+    cd koishi-plugin-genshin
+    yarn
+    ```
 
 3. 运行
 
-```
-yarn start
-```
+    ```
+    yarn start
+    ```
 
 4. 开启插件
 
-<img src="https://github.com/KuroshioDev/koishi-plugin-genshin/blob/develop/%E6%95%99%E7%A8%8B.png?raw=true">
+    <img src="https://github.com/KuroshioDev/koishi-plugin-genshin/blob/develop/%E6%95%99%E7%A8%8B.png?raw=true">
 
 ## 🌈 其他
 
