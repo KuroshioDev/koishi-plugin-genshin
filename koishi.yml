@@ -36,9 +36,7 @@ plugins:
     ~adapter-kook: {}
     ~adapter-feishu: {}
     gocqhttp: {}
-  '@kuroshio/genshin':
-    redis:
-      password: '123456'
+  '~@kuroshio/genshin': {}
   group:develop:
     hmr:
       $if: env.KOISHI_WATCH_ROOT
