@@ -1,6 +1,6 @@
 const { base } = require( './base.js')
 const cfg = require( '../../lib/config/config.js')
-const { common } = require('../../lib/common/common.js')
+const common = require('../../lib/common/common.js')
 const fs  = require( 'node:fs')
 const moment = require( 'moment')
 const { GachaLog } = require( './gachaLog.js')

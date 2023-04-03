@@ -1,4 +1,4 @@
-const { plugin } = require( '../../lib/plugins/plugin.js')
+const plugin = require( '../../lib/plugins/plugin.js')
 const gsCfg  = require( '../model/gsCfg.js')
 const User = require( '../model/user.js')
 const { Logger } = require( 'koishi')

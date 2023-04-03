@@ -4,7 +4,7 @@ const MysApi = require( './mys/mysApi.js')
 const lodash = require( 'lodash')
 const moment = require( 'moment')
 const fs  = require( 'node:fs')
-const { common } = require('../../lib/common/common.js')
+const common = require('../../lib/common/common.js')
 const { Logger  } = require( 'koishi')
 
 const logger = new Logger("genshin-model-MysNews")

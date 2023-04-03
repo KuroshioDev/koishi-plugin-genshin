@@ -4,7 +4,7 @@ const gsCfg = require( './gsCfg.js')
 const lodash = require( 'lodash')
 const moment = require( 'moment')
 const fs  = require( 'node:fs')
-const { common } = require( "../../lib/common/common.js")
+const common = require( "../../lib/common/common.js")
 
 let imgFile = {}
 

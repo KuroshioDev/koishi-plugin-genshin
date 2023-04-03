@@ -1,6 +1,6 @@
 /** 导入plugin */
-const { plugin } = require( '../../lib/plugins/plugin.js')
-const { common }= require( "../../lib/common/common.js")
+const plugin = require( '../../lib/plugins/plugin.js')
+const common= require( "../../lib/common/common.js")
 const gsCfg  = require( '../model/gsCfg.js')
 const { segment } = require( 'oicq')
 const fs  = require( 'node:fs')

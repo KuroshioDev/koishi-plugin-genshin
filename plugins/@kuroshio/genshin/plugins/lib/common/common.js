@@ -158,4 +158,4 @@ async function makeForwardMsg (e, msg = [], dec = '') {
   return forwardMsg
 }
 
-exports.common = { sleep, relpyPrivate, downFile, makeForwardMsg, getRootPath, getConfigPath, getDataPath, getResourcePath, getPluginsPath, getProjectName, getSourcePath}
+module.exports = { sleep, relpyPrivate, downFile, makeForwardMsg, getRootPath, getConfigPath, getDataPath, getResourcePath, getPluginsPath, getProjectName, getSourcePath}

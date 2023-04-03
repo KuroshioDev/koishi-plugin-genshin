@@ -1,4 +1,4 @@
-const { plugin } = require( '../../lib/plugins/plugin.js')
+const plugin = require( '../../lib/plugins/plugin.js')
 const { User } = require( '../model/user.js')
 const puppeteer = require( '../../lib/puppeteer/puppeteer.js')
 const MysInfo = require( '../model/mys/mysInfo.js')

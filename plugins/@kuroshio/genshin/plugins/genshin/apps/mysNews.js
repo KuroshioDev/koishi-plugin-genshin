@@ -1,4 +1,4 @@
-const { plugin } = require( '../../lib/plugins/plugin.js')
+const plugin = require( '../../lib/plugins/plugin.js')
 const { MysNews } = require( '../model/mysNews.js')
 const fs  = require( 'node:fs')
 const lodash = require( 'lodash')

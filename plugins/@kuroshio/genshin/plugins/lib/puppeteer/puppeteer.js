@@ -5,7 +5,7 @@ const { segment } = require( 'oicq')
 const chokidar = require( 'chokidar')
 const { Logger } = require( "koishi")
 const path = require( 'path')
-const { common } = require( '../common/common')
+const common = require( '../common/common')
 
 const logger = new Logger("puppeteer")
 const _path = process.cwd()
@@ -136,7 +136,7 @@ class Puppeteer {
         // encoding: 'base64',
         type: data.imgType || 'jpeg',
         omitBackground: data.omitBackground || false,
-        quality: data.quality || 90,
+        quality: data.quality || 100,
         path: data.path || ''
       }
 
@@ -177,12 +177,17 @@ class Puppeteer {
 
   /** 模板 */
   dealTpl (name, data) {
-    let { tplFile, saveId = name } = data
-    let savePath = `${common.getDataPath()}/html/${name}/${saveId}.html`
+    let { tplFile, saveId = name, pluginName } = data
+    let savePath
+    if (pluginName) {
+      savePath = `${common.getDataPath()}/html/${pluginName}/${name}/${saveId}.html`
+    }else {
+      savePath = `${common.getDataPath()}/html/${name}/${saveId}.html`
+    }
     tplFile = `${common.getRootPath()}/${tplFile}`
     /** 读取html模板 */
     if (!this.html[tplFile]) {
-      this.createDir(`${common.getDataPath()}/html/${name}/${saveId}.html`)
+      this.createDir(savePath)
 
       try {
         this.html[tplFile] = fs.readFileSync(tplFile, 'utf8')

@@ -1,4 +1,4 @@
-const { plugin } = require( '../../lib/plugins/plugin.js')
+const plugin = require( '../../lib/plugins/plugin.js')
 const { PayData, renderImg } = require( '../model/payLogData.js')
 const url = require( 'url')
 const fs  = require( 'fs')

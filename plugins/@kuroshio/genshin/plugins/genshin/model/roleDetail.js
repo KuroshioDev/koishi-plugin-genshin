@@ -5,7 +5,7 @@ const lodash = require( 'lodash')
 const { segment } = require( 'oicq')
 const fs  = require( 'node:fs')
 const fetch = require( 'node-fetch')
-const { common } = require('../../lib/common/common.js')
+const common = require('../../lib/common/common.js')
 
 class RoleDetail extends base {
   constructor (e) {

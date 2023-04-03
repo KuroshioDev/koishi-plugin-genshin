@@ -4,7 +4,7 @@ const { base } = require( './base.js')
 const MysApi = require( './mys/mysApi.js')
 const gsCfg = require( './gsCfg.js')
 const User = require( './user.js')
-const { common } = require('../../lib/common/common.js')
+const common = require('../../lib/common/common.js')
 const cfg = require( '../../lib/config/config.js')
 const {Logger} = require( "koishi")
 
@@ -29,7 +29,7 @@ class MysSign extends base {
     let ck = await gsCfg.getBingCkSingle(e.user_id)
 
     if (lodash.isEmpty(ck)) {
-      e.reply('无法签到，请先#绑定cookie\n发送【cookie帮助】查看配置教程', false, { at: true })
+      e.reply('无法签到，请先绑定cookie\n发送【#扫码登录】后用米游社扫码二维码即可', false, { at: true })
       return false
     }
 
@@ -212,7 +212,7 @@ class MysSign extends base {
       this.is_verify = true
       await common.sleep(1000)
       if (!signing && !this?.msgYz) {
-        if(this.e.session.platform == 'qqguild' && this.e.session.guildId != '93248811658287152') {
+        if(this.e.session.platform == 'qqguild' && this.e.session.guildId != '9627516829995618702') {
           this.e?.reply("遇见验证码,请前往官方频道签到绕过验证码")
           return false
         }

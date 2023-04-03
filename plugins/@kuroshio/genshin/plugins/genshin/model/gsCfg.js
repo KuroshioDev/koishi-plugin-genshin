@@ -3,7 +3,7 @@ const chokidar = require( 'chokidar')
 const fs  = require( 'node:fs')
 const lodash = require( 'lodash')
 const { Logger } = require( 'koishi')
-const { common } = require( "../../lib/common/common.js")
+const common = require( "../../lib/common/common.js")
 
 const logger = new Logger("genshin-model-GsCfg")
 const path = process.cwd()

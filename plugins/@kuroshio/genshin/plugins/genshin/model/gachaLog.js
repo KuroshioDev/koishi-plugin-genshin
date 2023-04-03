@@ -2,7 +2,7 @@ const {  base } = require( './base.js')
 const fetch = require( 'node-fetch')
 const lodash = require( 'lodash')
 const fs = require( 'node:fs')
-const { common } = require('../../lib/common/common.js')
+const common = require('../../lib/common/common.js')
 const gsCfg = require( './gsCfg.js')
 
 class GachaLog extends base {

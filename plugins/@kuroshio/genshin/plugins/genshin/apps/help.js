@@ -1,4 +1,4 @@
-const { plugin } = require( '../../lib/plugins/plugin.js')
+const plugin = require( '../../lib/plugins/plugin.js')
 const puppeteer = require( '../../lib/puppeteer/puppeteer.js')
 const { Help } = require( '../model/help.js')
 const md5 = require( 'md5')

@@ -1,7 +1,7 @@
 const YAML  = require( 'yaml')
 const fs  = require( 'node:fs')
 const chokidar = require( 'chokidar')
-const { common } = require( "../common/common")
+const common = require( "../common/common")
 
 /** 配置文件 */
 class Cfg {

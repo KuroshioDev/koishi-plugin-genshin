@@ -1,5 +1,5 @@
 const { Runtime } = require( './runtime.js')
-const { segment } = require( 'koishi')
+const { segment, Logger } = require( 'koishi')
 let stateArr = {}
 
 class plugin {
@@ -45,6 +45,7 @@ class plugin {
     this.session = data.session
     this.e = this.createEvent()
     this.e.config = data.config
+    this.logger = new Logger(this.name ? this.name : "plugin")
   }
 
   createEvent() {
@@ -70,7 +71,6 @@ class plugin {
     this.createMsg(this.session, session)
     session.reply = this.reply
     session.dealMessage = this.dealMessage
-    session.getContext = this.getContext
     session.logFnc = this.logFnc()
     Runtime.init(session)
     return session;
@@ -111,14 +111,14 @@ class plugin {
         if(msg.file instanceof Object) {
           return this.session.send(segment.image(msg.file, "image/png"))
         }else {
-          return this.session.send(segment.image(msg.file))
+          return this.session.send(segment.image(msg.file, "image/png"))
         }
       case "video":
           return this.session.send(segment.video(msg.file))
       case "at":
         return
       default:
-        if(msg && msg.startsWith('file:///')) return this.session.send(segment.image(msg, "image/png"))
+        if(msg && (msg.startsWith('file:///') || msg.startsWith('base64://'))) return this.session.send(segment.image(msg, "image/png"))
         return this.session.send(msg)
     }
   }
@@ -127,12 +127,12 @@ class plugin {
     return `[${this.name}]`
   }
 
-  conKey (isGroup = false) {
-    if (isGroup) {
-      return `${this.name}.${this.e.group_id}`
-    } else {
-      return `${this.name}.${this.userId || this.e.user_id}`
-    }
+  info(text) {
+    this.logger.info(text)
+  }
+
+  error(text) {
+    this.logger.error(text)
   }
 
   /**
@@ -141,39 +141,16 @@ class plugin {
    * @param time 操作时间，默认120秒
    */
   setContext (type, isGroup = false, time = 120) {
-    let key = this.conKey(isGroup)
-    if (!stateArr[key]) stateArr[key] = {}
-    stateArr[key][type] = this.e
-    if (time) {
-      /** 操作时间 */
-      setTimeout(() => {
-        if (stateArr[key][type]) {
-          delete stateArr[key][type]
-          this.e.reply('操作超时已取消', true)
-        }
-      }, time * 1000)
-    }
   }
 
   getContext () {
-    return this.context
   }
-
-  getContextGroup () {
-    let key = this.conKey(true)
-    return stateArr[key]
-  }
-
   /**
    * @param type 执行方法
    * @param isGroup 是否群聊
    */
   finish (type, isGroup = false) {
-    if (stateArr[this.conKey(isGroup)] && stateArr[this.conKey(isGroup)][type]) {
-      delete stateArr[this.conKey(isGroup)][type]
-    }
-
   }
 }
 
-exports.plugin = plugin
+module.exports = plugin

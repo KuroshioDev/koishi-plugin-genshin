@@ -1,5 +1,5 @@
-const { plugin } = require("../../lib/plugins/plugin")
-const { common }= require( "../../lib/common/common.js")
+const plugin = require("../../lib/plugins/plugin")
+const common= require( "../../lib/common/common.js")
 const fetch = require('node-fetch')
 const lodash = require('lodash')
 

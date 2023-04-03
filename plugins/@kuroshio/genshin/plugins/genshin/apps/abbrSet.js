@@ -1,4 +1,4 @@
-const { plugin } = require( '../../lib/plugins/plugin.js')
+const plugin = require( '../../lib/plugins/plugin.js')
 const fs = require( 'node:fs')
 const gsCfg  = require( '../model/gsCfg.js')
 const YAML  = require( 'yaml')

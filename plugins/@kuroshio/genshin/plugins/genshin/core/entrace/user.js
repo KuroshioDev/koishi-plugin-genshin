@@ -59,18 +59,24 @@ class UserApp {
       .action(({session}) => {
         new app.user(ctx, session).showUid()
       })
-
+    
     ctx.command('genshin.user.binguid', {authority: 1}).userFields(['id'])
       .alias('#绑定uid')
+      .shortcut(/^#绑定(uid|UID| )?[1-9][0-9]{8}$/)
       .action(async ({session}) => {
+        let uid = session.content.replace(/\s*/g,"").match(/[1|2|5-9][0-9]{8}/g)
+        if (uid) {
+          session.content = uid.toString()
+          new app.user(ctx, session).saveUid()
+          return
+        }
         await session.send('请发送 uid')
-        const uid = (await session.prompt()).toString()
-        session.content = uid
-        new app.user(ctx, session).saveUid()
-      })
-    ctx.command('genshin.user.binguid1', {authority: 1}).userFields(['id'])
-      .shortcut(/^#绑定(uid|UID)?[1-9][0-9]{8}$/)
-      .action(async ({session}) => {
+        uid = (await session.prompt())
+        if (!uid) {
+          session.send('绑定失败，UID为空，请重新发送#绑定uid，如果是QQ频道需要艾特机器人')
+          return
+        }
+        session.content = uid.toString()
         new app.user(ctx, session).saveUid()
       })
   }

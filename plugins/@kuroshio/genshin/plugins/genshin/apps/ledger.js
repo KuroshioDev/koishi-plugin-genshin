@@ -1,4 +1,4 @@
-const { plugin } = require( '../../lib/plugins/plugin.js')
+const plugin = require( '../../lib/plugins/plugin.js')
 const puppeteer = require( '../../lib/puppeteer/puppeteer.js')
 const { Ledger } = require( '../model/ledger.js')
 const fs  = require( 'node:fs')

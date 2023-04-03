@@ -6,7 +6,7 @@
 // import { EnkaClient } from 'enka-network-api'
 // const { puppeteer } = require( '../../lib/puppeteer.js'
 // import fs from 'node:fs'
-// const { common } = require('../../lib/common/common.js')
+// const common = require('../../lib/common/common.js')
 
 // if (!fs.existsSync('./data/enkaNetwork/')) {
 //   fs.mkdirSync('./data/enkaNetwork/')

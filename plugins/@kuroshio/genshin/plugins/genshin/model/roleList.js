@@ -3,7 +3,7 @@ const MysInfo = require( './mys/mysInfo.js')
 const MysApi = require( './mys/mysApi.js')
 const gsCfg = require( './gsCfg.js')
 const lodash = require( 'lodash')
-const { common } = require('../../lib/common/common.js')
+const common = require('../../lib/common/common.js')
 const { Logger } = require( 'koishi')
 
 const logger = new Logger("genshin-model-RoleList")

@@ -2,13 +2,13 @@ const {base } = require( './base.js')
 const fetch = require( 'node-fetch')
 const lodash = require( 'lodash')
 const puppeteer = require( '../../lib/puppeteer/puppeteer.js')
-const { common } = require('../../lib/common/common.js')
+const common = require('../../lib/common/common.js')
 const { segment } = require( 'oicq')
 const gsCfg  = require( '../model/gsCfg.js')
 const { Logger } = require( 'koishi')
 
 const logger = new Logger("genshin-model-MysNews")
-const _path = process.cwd()
+const _path = common.getPluginsPath()
 let emoticon
 
 class MysNews extends base {
@@ -64,7 +64,7 @@ class MysNews extends base {
 
     const page = await puppeteer.browser.newPage()
     try {
-      await page.goto(`file://${_path}${lodash.trim(savePath, '.')}`, { timeout: 120000 })
+      await page.goto(`file:///${lodash.trim(savePath, '.')}`, { timeout: 120000 })
       const body = await page.$('#container') || await page.$('body')
       const boundingBox = await body.boundingBox()
 

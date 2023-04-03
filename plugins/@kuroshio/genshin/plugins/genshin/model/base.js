@@ -1,4 +1,4 @@
-const { common } =  require("../../lib/common/common")
+const common =  require("../../lib/common/common")
 const { Logger } = require('koishi')
 
 class base {
@@ -25,6 +25,7 @@ class base {
 
     return {
       saveId: this.userId,
+      pluginName: "genshin-plugin",
       cwd: this._path,
       tplFile: `./plugins/genshin/resources/html/${this.model}/${this.model}.html`,
       res: `${common.getResourcePath()}`,

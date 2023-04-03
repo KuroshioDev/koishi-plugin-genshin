@@ -1,4 +1,4 @@
-const { plugin } = require( '../../lib/plugins/plugin.js')
+const plugin = require( '../../lib/plugins/plugin.js')
 const { EnkaNetWork} = require('../model/enkaNetwork.js')
 
 

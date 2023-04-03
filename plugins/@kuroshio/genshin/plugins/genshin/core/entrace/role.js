@@ -1,18 +1,10 @@
 class RoleApp {
   constructor(app, ctx, config) {
-    ctx.guild().command('genshin.profile.role [uid:string]', {authority: 1}).userFields(['id'])
-      .alias('#角色查询')
-      .shortcut(/^#(角色|查询|查询角色|角色查询|人物)[ |0-9]*$/)
-      .shortcut( /^(#*uid|#*UID)[\s*][1|2|5-9][0-9]{8}$/)
-      .action(async (_, uid) => {
-        new app.role(ctx, _.session).roleIndex()
-      })
-
-    ctx.guild().command('genshin.profile.rolecard', {authority: 1}).userFields(['id'])
-      .alias('#角色卡片')
-      .action(async ({session}) => {
-        new app.role(ctx, session).roleCard()
-      })
+    ctx.guild().command('genshin.profile.roleCard', {authority: 1}).userFields(['id'])
+    .alias('#角色卡片')
+    .action(async ({session}) => {
+      new app.role(ctx, session).roleCard()
+    })
 
     ctx.guild().command('genshin.profile.abyss', {authority: 1}).userFields(['id'])
       .alias('#深渊')

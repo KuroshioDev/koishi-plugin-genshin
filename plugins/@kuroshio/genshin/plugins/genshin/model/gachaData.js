@@ -4,6 +4,7 @@ const lodash = require( 'lodash')
 const moment = require( 'moment')
 const fetch = require( 'node-fetch')
 const fs  = require( 'node:fs')
+const common = require('../../lib/common/common')
 
 let imgFile = {}
 
@@ -475,7 +476,7 @@ class GachaData extends base {
       lifeNum: this.user[this.type]?.lifeNum || 0
     }
 
-    logger.debug(`[${poolName}] [五星数：${nowFive}] [${info}] [定轨：${res.lifeNum}]`)
+    //this.debug(`[${poolName}] [五星数：${nowFive}] [${info}] [定轨：${res.lifeNum}]`)
 
     return res
   }
@@ -516,7 +517,7 @@ class GachaData extends base {
 
   initFile () {
     if (imgFile['刻晴']) return imgFile
-    let path = './plugins/genshin/resources/img/gacha/'
+    let path = `${common.getPluginsPath()}/genshin/resources/img/gacha/`
     let character = fs.readdirSync(path + 'character/')
     let weapon = fs.readdirSync(path + 'weapon/')
 
@@ -530,4 +531,4 @@ class GachaData extends base {
   }
 }
 
-exports.GachaData = GachaData
+module.exports = GachaData

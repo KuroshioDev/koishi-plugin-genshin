@@ -182,7 +182,7 @@ class MysUser extends BaseModel {
         }
       }
     } else {
-      console.log(`ltuid:${this.ltuid}暂无uid信息，请检查...`)
+      logger.info(`ltuid:${this.ltuid}暂无uid信息，请检查...`)
     }
     // 缓存ckData，供后续缓存使用
     // ltuid关系存储到与server无关的cache中，方便后续检索
@@ -273,17 +273,17 @@ class MysUser extends BaseModel {
   // 删除MysUser用户记录，会反向删除User中的记录及绑定关系
   async delWithUser () {
     // 查找用户
-    let qqArr = await this.cache.kGet(tables.qq, this.ltuid, true)
-    if (qqArr && qqArr.length > 0) {
-      for (let qq of qqArr) {
-        //let user = await NoteUser.create(qq)
-        if (user) {
-          // 调用user删除ck
-          await user.delCk(this.ltuid, false)
-        }
-      }
-    }
-    await this.del()
+    // let qqArr = await this.cache.kGet(tables.qq, this.ltuid, true)
+    // if (qqArr && qqArr.length > 0) {
+    //   for (let qq of qqArr) {
+    //     //let user = await NoteUser.create(qq)
+    //     if (user) {
+    //       // 调用user删除ck
+    //       await user.delCk(this.ltuid, false)
+    //     }
+    //   }
+    // }
+    // await this.del()
   }
 
   // 为当前用户添加uid查询记录

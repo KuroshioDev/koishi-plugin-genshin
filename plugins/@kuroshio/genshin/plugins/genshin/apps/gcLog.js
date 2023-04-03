@@ -1,11 +1,11 @@
-const { plugin } = require( '../../lib/plugins/plugin.js')
+const plugin = require( '../../lib/plugins/plugin.js')
 const puppeteer = require( '../../lib/puppeteer/puppeteer.js')
 const fs  = require( 'node:fs')
 const { GachaLog } = require( '../model/gachaLog.js')
 const { ExportLog } = require( '../model/exportLog.js')
 const { LogCount } = require( '../model/logCount.js')
 const { segment } = require( 'oicq')
-const { common }= require( "../../lib/common/common.js")
+const common= require( "../../lib/common/common.js")
 
 const _path = common.getRootPath()
 

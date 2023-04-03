@@ -16,7 +16,7 @@ const calculatorApp = require( './entrace/calculator.js')
 const { Logger } = require( 'koishi')
 const YAML = require("yaml");
 const fs = require("fs");
-const {common} = require("../../lib/common/common");
+const common = require("../../lib/common/common");
 
 const logger = new Logger("Kuroshio-Genshin-Plugin")
 

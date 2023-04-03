@@ -1,5 +1,5 @@
 
-const {common} = require('./common/common.js')
+const common = require('./common/common.js')
 const { createClient } = require( 'redis')
 const { Logger } = require( 'koishi')
 const { exec } = require('child_process')

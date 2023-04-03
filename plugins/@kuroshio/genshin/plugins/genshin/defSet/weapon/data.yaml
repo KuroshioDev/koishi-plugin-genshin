@@ -28,6 +28,7 @@ Name:
   '1499745907': 「一心传」名刀
   '1538092267': 「一心传」名刀
   '3464027035': 「一心传」名刀
+  '2448629019': 东花坊时雨
   '902264035': 风鹰剑
   '4055003299': 天空之刃
   '2949448555': 苍古自由之誓
@@ -36,6 +37,7 @@ Name:
   '4124851547': 雾切之回光
   '1600275315': 波乱月白经津
   '454086795': 圣显之钥
+  '275622963': 裁叶萃光
   '2666951267': 训练大剑
   '1182966603': 佣兵重剑
   '1479961579': 铁影阔剑
@@ -121,6 +123,8 @@ Name:
   '693354267': 尘世之锁
   '1890163363': 不灭月华
   '310247243': 神乐之真意
+  '1201790667': 千夜浮梦
+  '359484419': 图莱杜拉的回忆
   '3600623979': 猎弓
   '2340970067': 历练的猎弓
   '3975746731': 鸦羽弓
@@ -188,6 +192,7 @@ Type:
   原木刀: 单手剑
   西福斯的月光: 单手剑
   「一心传」名刀: 单手剑
+  东花坊时雨: 单手剑
   风鹰剑: 单手剑
   天空之刃: 单手剑
   苍古自由之誓: 单手剑
@@ -196,6 +201,7 @@ Type:
   雾切之回光: 单手剑
   波乱月白经津: 单手剑
   圣显之钥: 单手剑
+  裁叶萃光: 单手剑
   训练大剑: 双手剑
   佣兵重剑: 双手剑
   铁影阔剑: 双手剑
@@ -281,6 +287,8 @@ Type:
   尘世之锁: 法器
   不灭月华: 法器
   神乐之真意: 法器
+  千夜浮梦: 法器
+  图莱杜拉的回忆: 法器
   猎弓: 弓
   历练的猎弓: 弓
   鸦羽弓: 弓
@@ -343,6 +351,7 @@ Icon:
   原木刀: UI_EquipIcon_Sword_Arakalari
   西福斯的月光: UI_EquipIcon_Sword_Pleroma
   「一心传」名刀: UI_EquipIcon_Sword_YoutouEnchanted
+  东花坊时雨: UI_EquipIcon_Sword_Kasabouzu
   风鹰剑: UI_EquipIcon_Sword_Falcon
   天空之刃: UI_EquipIcon_Sword_Dvalin
   苍古自由之誓: UI_EquipIcon_Sword_Widsith
@@ -351,6 +360,7 @@ Icon:
   雾切之回光: UI_EquipIcon_Sword_Narukami
   波乱月白经津: UI_EquipIcon_Sword_Amenoma
   圣显之钥: UI_EquipIcon_Sword_Deshret
+  裁叶萃光: UI_EquipIcon_Sword_Ayus
   训练大剑: UI_EquipIcon_Claymore_Aniki
   佣兵重剑: UI_EquipIcon_Claymore_Oyaji
   铁影阔剑: UI_EquipIcon_Claymore_Glaive
@@ -436,6 +446,8 @@ Icon:
   尘世之锁: UI_EquipIcon_Catalyst_Kunwu
   不灭月华: UI_EquipIcon_Catalyst_Kaleido
   神乐之真意: UI_EquipIcon_Catalyst_Narukami
+  千夜浮梦: UI_EquipIcon_Catalyst_Ayus
+  图莱杜拉的回忆: UI_EquipIcon_Catalyst_Alaya
   猎弓: UI_EquipIcon_Bow_Hunters
   历练的猎弓: UI_EquipIcon_Bow_Old
   鸦羽弓: UI_EquipIcon_Bow_Crowfeather

@@ -7,7 +7,7 @@
 const lodash = require('lodash')
 const fs  = require( 'node:fs')
 const gsCfg = require( '../../genshin/model/gsCfg.js')
-const { common } = require('../common/common.js')
+const common = require('../common/common.js')
 const cfg = require( '../config/config.js')
 const MysApi= require( '../../genshin/model/mys/mysApi')
 const MysInfo = require( '../../genshin/model/mys/mysInfo.js')

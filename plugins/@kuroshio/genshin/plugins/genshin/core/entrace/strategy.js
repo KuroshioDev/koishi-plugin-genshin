@@ -1,8 +1,7 @@
 class strategyApp {
   constructor(app, ctx, config) {
     ctx.guild().command('genshin.wiki.strategy', {authority: 1}).userFields(['id'])
-      .shortcut(/^#\S+攻略$/)
-      .shortcut(/^#\S+攻略(?:[1-4])$/)
+      .shortcut(/^(?!#米游社)#?((更新)?)\S+攻略([1-7])?$/)
       .action(async ({session}) => {
         new app.strategy(ctx, session).strategy()
       })

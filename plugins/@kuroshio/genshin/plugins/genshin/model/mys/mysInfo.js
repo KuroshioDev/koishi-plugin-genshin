@@ -4,7 +4,7 @@ const lodash = require( 'lodash')
 const { NoteUser } = require( './NoteUser.js')
 const { MysUser } = require( './MysUser.js')
 const { DailyCache } = require( './DailyCache.js')
-const { common } = require('../../../lib/common/common.js')
+const common = require('../../../lib/common/common.js')
 const { Logger} = require( "koishi")
 
 const logger = new Logger("genshin-model-mys-MysInfo")
