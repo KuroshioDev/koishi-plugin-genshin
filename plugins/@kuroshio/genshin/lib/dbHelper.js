@@ -4,8 +4,8 @@ class DBHelper {
     constructor(ctx) {
         this.context = ctx;
     }
-    async get(tableName, query) {
-        let data = await this.context.database.get(tableName, query);
+    async get(tableName, query, field) {
+        let data = await this.context.database.get(tableName, query, field);
         if (data && data.length > 0) {
             return data[0];
         }
@@ -13,8 +13,17 @@ class DBHelper {
             return null;
         }
     }
-    async list(tableName, query, filed) {
-        let data = await this.context.database.get(tableName, query, filed);
+    async list(tableName, query, offset = 1, limit, order) {
+        let sql = await this.context.database.select(tableName, query);
+        if (limit) {
+            sql.limit(offset, limit);
+        }
+        if (order) {
+            order.forEach(o => {
+                sql.orderBy(o.field, o.direction);
+            });
+        }
+        let data = sql.execute();
         if (!data) {
             return [];
         }
@@ -46,6 +55,9 @@ class DBHelper {
     }
     async remove(tableName, query) {
         await this.context.database.remove(tableName, query);
+    }
+    async select(tableName, query, filed) {
+        let data = await this.context.database;
     }
 }
 exports.default = DBHelper;

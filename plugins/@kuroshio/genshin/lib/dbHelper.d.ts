@@ -3,8 +3,8 @@ import { Query } from "@minatojs/core";
 export default class DBHelper {
     private context;
     constructor(ctx: Context);
-    get(tableName: Keys<Tables, string>, query: Query<never>): Promise<Pick<never, never>>;
-    list(tableName: Keys<Tables, string>, query: Query<never>, filed: any): Promise<Pick<never, never>[]>;
+    get(tableName: Keys<Tables, string>, query: Query<never>, field: any): Promise<Pick<never, never>>;
+    list(tableName: Keys<Tables, string>, query: Query<never>, offset: number, limit: any, order: any): Promise<Pick<never, never>[]>;
     create(tableName: Keys<Tables, string>, data: never): Promise<boolean>;
     update(tableName: Keys<Tables, string>, query: Query<never>, data: any): Promise<void>;
     /**
@@ -14,4 +14,5 @@ export default class DBHelper {
      */
     upsert(tableName: Keys<Tables, string>, data: any): Promise<void>;
     remove(tableName: Keys<Tables, string>, query: Query<never>): Promise<void>;
+    select(tableName: Keys<Tables, string>, query: Query<never>, filed: any): Promise<void>;
 }
