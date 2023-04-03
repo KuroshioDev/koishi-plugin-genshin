@@ -1,4 +1,4 @@
-const {plugin} = require("../lib/plugins/plugin.js");
+const plugin = require("../lib/plugins/plugin.js");
 
 class Example extends plugin {
   constructor (ctx, session) {

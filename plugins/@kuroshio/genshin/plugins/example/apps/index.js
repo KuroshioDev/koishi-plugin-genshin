@@ -1,5 +1,5 @@
 const {Logger} = require("koishi")
-const {common} = require("../../lib/common/common")
+const common = require("../../lib/common/common")
 const fs = require( 'node:fs')
 const files = fs.readdirSync(`${common.getPluginsPath()}/example/apps`).filter(file => file.endsWith('.js') && !file.startsWith('index'))
 const logger = new Logger('kuroshio')
