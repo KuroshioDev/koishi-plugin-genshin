@@ -1,5 +1,6 @@
 const { Runtime } = require( './runtime.js')
 const { segment, Logger } = require( 'koishi')
+const { pathToFileURL } =  require('url')
 let stateArr = {}
 
 class plugin {
@@ -71,7 +72,7 @@ class plugin {
     this.createMsg(this.session, session)
     session.reply = this.reply
     session.dealMessage = this.dealMessage
-    session.logFnc = this.logFnc()
+    session.logFnc = this.logFnc
     Runtime.init(session)
     return session;
   }
@@ -91,39 +92,44 @@ class plugin {
     })
   }
   /**
- * @param msg 发送的消息
- * @param quote 是否引用回复
- * @param data.recallMsg 群聊是否撤回消息，0-120秒，0不撤回
- * @param data.at 是否at用户
- */
-  reply (msg = '', quote = false, data = {}) {
+   * @param msg 发送的消息
+   * @param quote 是否引用回复
+   * @param data.recallMsg 群聊是否撤回消息，0-120秒，0不撤回
+   * @param data.at 是否at用户
+   */
+  async reply(msg = '', quote = false, data = {}) {
     if (!this.reply || !msg) return false
-    if(Array.isArray(msg)) {
-      msg.forEach(m => this.dealMessage(m))
-    }else {
+    if (Array.isArray(msg)) {
+      for (let i = 0; i < msg.length; i++) {
+        let m = msg[i]
+        await this.dealMessage(m)
+      }
+    } else {
       return this.dealMessage(msg)
     }
   }
 
-  dealMessage(msg) {
+  async dealMessage(msg) {
     switch (msg.type) {
       case "image":
-        if(msg.file instanceof Object) {
-          return this.session.send(segment.image(msg.file, "image/png"))
-        }else {
-          return this.session.send(segment.image(msg.file, "image/png"))
+        if (msg.file instanceof Object) {
+          return await this.session.send(segment.image(msg.file, "image/png"))
+        } else {
+          return await this.session.send(segment.image(msg.file, "image/png"))
         }
       case "video":
-          return this.session.send(segment.video(msg.file))
+        return await this.session.send(segment.video(msg.file))
       case "at":
         return
+      case "record":
+        return await this.session.send(segment.audio(pathToFileURL(msg.file).href))
       default:
-        if(msg && (msg.startsWith('file:///') || msg.startsWith('base64://'))) return this.session.send(segment.image(msg, "image/png"))
-        return this.session.send(msg)
+        if (msg && (msg.startsWith('file:///') || msg.startsWith('base64://'))) return this.session.send(segment.image(msg, "image/png"))
+        return await this.session.send(msg)
     }
   }
 
-  logFnc(){
+  get logFnc(){
     return `[${this.name}]`
   }
 
