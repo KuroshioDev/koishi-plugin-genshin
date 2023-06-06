@@ -17,6 +17,10 @@ class User extends base {
 
     /** 多角色uid */
     this.allUid = []
+    if (this.e.isSr) {
+      /** 绑定的uid */
+      this.uidKey = `Yz:srJson:mys:qq-uid:${this.userId}`
+    }
   }
 
   // 获取当前user实例
@@ -99,20 +103,24 @@ class User extends base {
       })
     }
     await this.e.reply(uidMsg.join('\n'))
-
-    let msg = '【#体力】查询当前树脂'
-    msg += '\n【#签到】米游社原神自动签到'
-    msg += '\n【#关闭签到】开启或关闭原神自动签到'
-    msg += '\n【#原石】查看原石札记'
-    msg += '\n【#原石统计】原石统计数据'
-    msg += '\n【#练度统计】技能统计列表'
-    msg += '\n【#uid】当前绑定ck uid列表'
-    msg += '\n【#ck】检查当前用户ck是否有效'
-    msg += '\n【#我的ck】查看当前绑定ck'
-    msg += '\n【#删除ck】删除当前绑定ck'
+    let msg = ''
+    this.region_name += lodash.map(this.allUid, 'region_name').join(',')
+    if (/天空岛|世界树|America Server|Europe Server|Asia Server/.test(this.region_name)) {
+      msg += '原神模块支持：\n【#体力】查询当前树脂'
+      msg += '\n【#签到】米游社原神自动签到'
+      msg += '\n【#关闭签到】开启或关闭原神自动签到'
+      msg += '\n【#原石】查看原石札记'
+      msg += '\n【#原石统计】原石统计数据'
+      msg += '\n【#练度统计】技能统计列表'
+      msg += '\n【#uid】当前绑定ck uid列表'
+      msg += '\n【#ck】检查当前用户ck是否有效'
+      msg += '\n【#我的ck】查看当前绑定ck'
+      msg += '\n【#删除ck】删除当前绑定ck'
+    }
+    if (/星穹列车/.test(this.region_name)) {
+      msg += '\n星穹铁道支持：\n功能还在咕咕咕~'
+    }
     msg += '\n 支持绑定多个ck'
-
-    msg = ['使用命令说明', msg, '绑定成功：使用命令说明']
 
     await this.e.reply(msg)
   }
@@ -125,29 +133,35 @@ class User extends base {
       if (roleRes?.retcode === 0) {
         res = roleRes
         /** 国际服的标记 */
-        if (type == 'hoyolab' && typeof (param.mi18nLang) === 'string') {
+        if (type === 'hoyolab' && typeof (param.mi18nLang) === 'string') {
           this.ck += ` mi18nLang=${param.mi18nLang};`
         }
         break
       }
-      if (roleRes.retcode == -100) {
+      if (roleRes.retcode === -100) {
         this.checkMsg = '该ck已失效，请重新登录获取'
+      } else {
+        this.checkMsg = roleRes.message || 'error'
       }
-      this.checkMsg = roleRes.message || 'error'
     }
 
     if (!res) return false
 
     if (!res.data.list || res.data.list.length <= 0) {
-      this.checkMsg = '该账号尚未绑定原神角色！'
+      this.checkMsg = '该账号尚未绑定原神或星穹角色！'
       return false
+    } else {
+      res.data.list = res.data.list.filter(v => ['hk4e_cn', 'hkrpg_cn', 'hk4e_global', 'hkrpg_global'].includes(v.game_biz))
     }
 
+    //避免同时多个默认展示角色时候只绑定一个
+    let is_chosen = false
     /** 米游社默认展示的角色 */
     for (let val of res.data.list) {
-      if (val.is_chosen) {
+      if (val.is_chosen && !is_chosen) {
         this.uid = val.game_uid
         this.region_name = val.region_name
+        is_chosen = true
       } else {
         this.allUid.push({
           uid: val.game_uid,
@@ -175,19 +189,20 @@ class User extends base {
   }
 
   /** 保存ck */
-  async getCk () {
+  async getCk() {
     let ck = await gsCfg.getBingCkSingle(this.e.user_id)
-
     lodash.map(ck, o => {
       o.isMain = false
       return o
     })
+
     ck[this.uid] = {
       uid: this.uid,
       qq: this.e.user_id,
       ck: this.ck,
       ltuid: this.ltuid,
-      login_ticket: this.e.login_ticket,
+      login_ticket: this.login_ticket,
+      region_name: this.region_name,
       device_id: this.getGuid(),
       isMain: true
     }
@@ -199,6 +214,7 @@ class User extends base {
         qq: this.e.user_id,
         ck: this.ck,
         ltuid: this.ltuid,
+        region_name: v.region_name,
         device_id: this.getGuid(),
         isMain: false
       }
@@ -231,13 +247,26 @@ class User extends base {
       return
     }
     let uids = user.ckUids
+    let ckData = user.ckData
     let uid = user.uid * 1
-    let msg = [`当前uid：${uid}`, '当前绑定cookie Uid列表', '通过【#uid+序号】来切换uid']
-    for (let i in uids) {
-      let tmp = `${Number(i) + 1}: ${uids[i]}`
-      if (uids[i] * 1 === uid) {
+    let msg = ['当前绑定cookie Uid列表', '通过【#uid+序号】来切换uid']
+    let count = 0
+    let ck = []
+    for (let i in ckData) {
+      if (ck.includes(ckData[i].ck)) {
+        continue
+      }
+      let tmp = `${++count}: `
+      if (ckData[i].uid) {
+        tmp += `原神: ${ckData[i].uid}`
+      }
+      if (ckData[i].starrail_uid) {
+        tmp += `星穹铁道: ${ckData[i].starrail_uid}`
+      }
+      if (ckData[i].isMain) {
         tmp += ' ☑'
       }
+      ck.push(ckData[i].ck)
       msg.push(tmp)
     }
     await this.e.reply(msg.join('\n'))
@@ -252,7 +281,7 @@ class User extends base {
     }
     index = Number(index) - 1
     await user.setMainUid(index)
-    return await this.e.reply(`切换成功，当前uid：${user.uid}`)
+    return await this.e.reply(`切换成功，当前uid：${uidList[index]}`)
   }
 
   /** 加载旧ck */
@@ -324,7 +353,6 @@ class User extends base {
 
   async checkCkStatus () {
     let user = await this.user()
-
     if (!user.hasCk) {
       await this.e.reply(`\n未绑定CK，当前绑定uid：${user.uid || '无'}`, false, { at: true })
       return true
@@ -355,7 +383,6 @@ class User extends base {
     await this.e.reply(cks.join('\n----\n'), false, { at: true })
   }
 
-
   getGuid () {
     function S4 () {
       return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
@@ -378,3 +405,4 @@ class User extends base {
 }
 
 module.exports = User
+

@@ -1,10 +1,10 @@
 @font-face {
   font-family: "tttgbnumber";
-  src: url("../../../../../../resources/font/tttgbnumber.ttf");
+  src: url("../../../../../resources/font/tttgbnumber.ttf");
   font-weight: normal;
   font-style: normal;
 }
-
+  
   * {
     margin: 0;
     padding: 0;
@@ -49,7 +49,7 @@
   .uid {
     font-family: tttgbnumber;
   }
-
+  
   .data_box {
     border-radius: 15px;
     margin-top: 20px;
@@ -94,12 +94,12 @@
     width: 100%;
     height: 300px;
   }
-
+  
   #chartContainer2{
     width: 100%;
     height: 300px;
   }
-
+  
   .logo {
     font-size: 14px;
     font-family: "tttgbnumber";

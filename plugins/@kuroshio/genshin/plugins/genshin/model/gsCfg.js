@@ -128,7 +128,16 @@ class GsCfg {
 
     let result = {}
     userData.forEach(data =>{
-      result[data.uid] = data
+      if (data.uid) {
+        let genshin_data = {...data}
+        genshin_data.region_name = '原神'
+        result[data.uid] = genshin_data
+      }
+      if(data.starrail_uid) {
+        let sr_data = {...data};
+        sr_data.region_name = '星穹铁道'
+        result[data.starrail_uid] = sr_data
+      }
     })
     return result
   }
@@ -136,12 +145,28 @@ class GsCfg {
   async saveBingCk (userId, data) {
     for(let key in data) {
       let saveData = data[key]
+      let para = {}
+      if (saveData.region_name == '星穹列车') {
+        para["starrail_uid"] = saveData.uid
+        saveData["starrail_uid"] = saveData.uid
+        delete saveData['uid']
+      }else {
+        para["uid"] = saveData.uid
+      }
+
       let userData = await global.dbHelper.get('genshin_user_cookie', {
-        uid: saveData.uid,
-        user_id: userId
+        "user_id": userId,
+        "$and": [{"ck": saveData.ck}]
       })
+      if (!userData) {
+        userData = await global.dbHelper.get('genshin_user_cookie', {
+          "user_id": userId,
+          "$and": [para]
+        })
+      }
       saveData.user_id = userId
       saveData.update_time = new Date()
+      delete saveData['region_name']
       if(userData){
         delete saveData['id']
         await global.dbHelper.update('genshin_user_cookie', {id: userData.id}, saveData)

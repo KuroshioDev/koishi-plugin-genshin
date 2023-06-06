@@ -1,6 +1,6 @@
 @font-face {
   font-family: "tttgbnumber";
-  src: url("../../../../../../resources/font/tttgbnumber.ttf");
+  src: url("../../../../../resources/font/tttgbnumber.ttf");
   font-weight: normal;
   font-style: normal;
 }
@@ -131,7 +131,7 @@ body {
 .item .text_box .weapon_img{
   width: 100%;
   transform: scale(1.2, 1.2);
-
+  
 }
 .item .text_box .weapon_name_box{
   margin-left: 3px;

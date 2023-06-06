@@ -4,7 +4,8 @@ const lodash = require( 'lodash')
 const fs = require( 'node:fs')
 const common = require('../../lib/common/common.js')
 const gsCfg = require( './gsCfg.js')
-
+const { Logger } = require( 'koishi')
+const logger = new Logger("genshin-model-GsCfg")
 class GachaLog extends base {
   constructor (e) {
     super(e)
@@ -21,9 +22,21 @@ class GachaLog extends base {
       { type: 302, typeName: '武器' },
       { type: 200, typeName: '常驻' }
     ]
+    if (e.isSr) {
+      /** 绑定的uid */
+      this.uidKey = `Yz:srJson:mys:qq-uid:${this.userId}`
+
+      this.path = `./data/srJson/${this.e.user_id}/`
+      this.pool = [
+        { type: 11, typeName: '角色' },
+        { type: 12, typeName: '光锥' },
+        { type: 1, typeName: '常驻' },
+        { type: 2, typeName: '新手' }
+      ]
+    }
   }
 
-  async logUrl () {
+  async logUrl() {
     let url = this.e.msg
 
     /** 处理url */
@@ -43,8 +56,7 @@ class GachaLog extends base {
       if (i <= 1) await common.sleep(500)
     }
 
-    await this.e.reply('抽卡记录更新完成，您还可回复\n【#角色记录】统计角色池数据\n【#武器记录】统计武器池数据\n【#常驻记录】统计常驻池数据\n【#角色统计】按卡池统计数据\n【#导出记录】导出记录数据')
-
+    await this.e.reply(`抽卡记录更新完成，您还可回复\n【#${this?.e?.isSr?'星铁光锥':'武器'}记录】统计${this?.e?.isSr?'星铁光锥':'武器'}池数据\n【#${this?.e?.isSr?'星铁':''}角色统计】按卡池统计数据\n【#导出记录】导出记录数据`)
     this.isLogUrl = true
 
     this.all = []
@@ -55,7 +67,7 @@ class GachaLog extends base {
     return data
   }
 
-  async logFile () {
+  async logFile() {
     let url = await this.downFile()
     if (!url) {
       if (this.e?.file?.name.includes('output')) {
@@ -68,7 +80,7 @@ class GachaLog extends base {
     return this.logUrl()
   }
 
-  dealUrl (url) {
+  dealUrl(url) {
     // timestamp=1641338980〈=zh-cn 修复链接有奇怪符号
     url = url.replace(/〈=/g, '&').split('getGachaLog?')[1]
 
@@ -120,7 +132,7 @@ class GachaLog extends base {
     return url[0]
   }
 
-  async checkUrl (param) {
+  async checkUrl(param) {
     if (!param.region) {
       this.e.reply('链接参数错误：缺少region\n请复制完整链接')
       return false
@@ -172,10 +184,9 @@ class GachaLog extends base {
     }
   }
 
-  async logApi (param) {
+  async logApi(param) {
     // 调用一次接口判断链接是否正确
     let logUrl = 'https://hk4e-api.mihoyo.com/event/gacha_info/api/getGachaLog?'
-
     /** 国际服 */
     if (!['cn_gf01', 'cn_qd01'].includes(param.region)) {
       logUrl = 'https://hk4e-api-os.mihoyo.com/event/gacha_info/api/getGachaLog?'
@@ -190,9 +201,24 @@ class GachaLog extends base {
       end_id: 0,
       ...param
     }).toString()
-
+    if (this.e.isSr) {
+      logUrl = 'https://api-takumi.mihoyo.com/common/gacha_record/api/getGachaLog?'
+      if (!['prod_gf_cn', 'prod_qd_cn'].includes(param.region)) {
+        logUrl = 'https://api-os-takumi.mihoyo.com/common/gacha_record/api/getGachaLog?'
+      }
+      logParam = new URLSearchParams({
+        authkey_ver: 1,
+        lang: 'zh-cn', // 只支持简体中文
+        gacha_type: 11,
+        page: 1,
+        size: 20,
+        game_biz: 'hkrpg_cn',
+        end_id: 0,
+        ...param
+      }).toString()
+    }
     let res = await fetch(logUrl + logParam).catch((err) => {
-      this.logger.error(`[获取抽卡记录失败] ${err}`)
+      logger.error(`[获取抽卡记录失败] ${err}`)
     })
     if (!res || !res.ok) {
       return { retcode: 400 }
@@ -200,8 +226,7 @@ class GachaLog extends base {
     return await res.json()
   }
 
-  /** 更新抽卡记录 */
-  async updateLog () {
+  async updateLog() {
     /** 获取authkey */
     let authkey = await redis.get(`${this.urlKey}${this.uid}`)
     if (!authkey) return false
@@ -211,11 +236,11 @@ class GachaLog extends base {
 
     /** key过期，或者没有数据 */
     if (res.retcode !== 0 || !res?.data?.list || res.data.list.length <= 0) {
-      this.logger.debug(`${this.e.logFnc} ${res.message || 'error'}`)
+      logger.debug(`${this.e.logFnc} ${res.message || 'error'}`)
       return false
     }
 
-    this.logger.info(`${this.e.logFnc}[uid:${this.uid}] 开始获取：${this.typeName}记录...`)
+    logger.info(`${this.e.logFnc}[uid:${this.uid}] 开始获取：${this.typeName}记录...`)
     let all = []
 
     let logJson = await this.readJson()
@@ -245,7 +270,7 @@ class GachaLog extends base {
   }
 
   /** 递归获取所有数据 */
-  async getAllLog (ids, authkey, page = 1, endId = 0) {
+  async getAllLog(ids, authkey, page = 1, endId = 0) {
     let res = await this.logApi({
       gacha_type: this.type,
       page,
@@ -368,29 +393,36 @@ class GachaLog extends base {
     return data
   }
 
-  getPool () {
-    let msg = this.e.msg.replace(/#|抽卡|记录|祈愿|分析|池/g, '')
-    this.type = 301
+  getPool(){
+    let msg = this.e.msg.replace(/#|抽卡|记录|祈愿|分析|池|原神|星铁|崩坏星穹铁道|铁道/g, '')
+    this.type = this.e.isSr ? 11 : 301
     this.typeName = '角色'
     switch (msg) {
       case 'up':
       case '抽卡':
       case '角色':
       case '抽奖':
-        this.type = 301
+        this.type = this.e.isSr ? 11 : 301
         this.typeName = '角色'
         break
       case '常驻':
-        this.type = 200
+        this.type = this.e.isSr ? 1 : 200
         this.typeName = '常驻'
         break
       case '武器':
-        this.type = 302
-        this.typeName = '武器'
+        this.type = this.e.isSr ? 12 : 302
+        this.typeName = this.e.isSr ? '光锥' : '武器'
+        break
+      case "光锥":
+        this.type = 12
+        this.typeName = '光锥'
+        break
+      case "新手":
+        this.type = this.e.isSr ? 2 : 100
+        this.typeName = '新手'
         break
     }
   }
-
   async getUid () {
 
     let userData = await global.dbHelper.list('genshin_user_cookie', {
@@ -471,7 +503,7 @@ class GachaLog extends base {
         } else {
           fourLog[val.name] = 1
         }
-        if (val.item_type == '武器') {
+        if (val.item_type == '武器' || val.item_type == '光锥') {
           weaponFourNum++
         }
       }
@@ -579,10 +611,8 @@ class GachaLog extends base {
       noWaiRate = (fiveNum - bigNum - wai) / (fiveNum - bigNum)
       noWaiRate = (noWaiRate * 100).toFixed(1)
     }
-
-    let firstTime = this.all[this.all.length - 1].time.substring(0, 16)
-    let lastTime = this.all[0].time.substring(0, 16)
-
+    let firstTime = this.all[this.all.length - 1]?.time.substring(0, 16)
+    let lastTime = this.all[0]?.time.substring(0, 16)
     return {
       allNum,
       noFiveNum,
@@ -604,14 +634,27 @@ class GachaLog extends base {
     }
   }
 
-  checkIsUp () {
-    if (['莫娜', '七七', '迪卢克', '琴'].includes(this.role.name)) {
+  checkIsUp() {
+    if (['莫娜', '七七', '迪卢克', '琴', '姬子', '杰帕德', '彦卿', '白露', '瓦尔特', '克拉拉', '布洛妮娅'].includes(this.role.name)) {
       return false
     }
-
-    if (this.role.name == '刻晴') {
-      let start = new Date('2021-02-17 18:00:00').getTime()
-      let end = new Date('2021-03-02 15:59:59').getTime()
+    let role5join = {
+      '刻晴': {
+        start: '2021-02-17 18:00:00',
+        end: '2021-03-02 15:59:59'
+      },
+      '提纳里': {
+        start: '2022-08-24 06:00:00',
+        end: '2022-09-09 17:59:59'
+      },
+      '迪希雅': {
+        start: '2023-03-01 06:00:00',
+        end: '2023-03-21 17:59:59'
+      }
+    }
+    if (lodash.keys(role5join).includes(this.role.name)) {
+      let start = new Date(role5join[this.role.name].start).getTime()
+      let end = new Date(role5join[this.role.name].end).getTime()
       let logTime = new Date(this.role.time).getTime()
 
       if (logTime < start || logTime > end) {
@@ -620,26 +663,14 @@ class GachaLog extends base {
         return true
       }
     }
-
-    if (this.role.name == '提纳里') {
-      let start = new Date('2022-08-24 06:00:00').getTime()
-      let end = new Date('2022-09-09 17:59:59').getTime()
-      let logTime = new Date(this.role.time).getTime()
-
-      if (logTime < start || logTime > end) {
-        return false
-      } else {
-        return true
-      }
-    }
-
     return true
   }
 
   /** 渲染数据 */
-  randData (data) {
+  randData(data) {
     let line = []
-    if (this.type == 301) {
+    let weapon = this.e.isSr ? '光锥' : '武器'
+    if ([301, 11].includes(this.type)) {
       line = [[
         { lable: '未出五星', num: data.noFiveNum, unit: '抽' },
         { lable: '五星', num: data.fiveNum, unit: '个' },
@@ -649,16 +680,16 @@ class GachaLog extends base {
         { lable: '未出四星', num: data.noFourNum, unit: '抽' },
         { lable: '五星常驻', num: data.wai, unit: '个' },
         { lable: 'UP平均', num: data.isvalidNum, unit: '抽' },
-        { lable: 'UP花费原石', num: data.upYs, unit: '' }
+        { lable: `UP花费${this?.e?.isSr ? '星琼' : '原石'}`, num: data.upYs, unit: '' }
       ]]
     }
     // 常驻池
-    if (this.type == 200) {
+    if ([200, 1].includes(this.type)) {
       line = [[
         { lable: '未出五星', num: data.noFiveNum, unit: '抽' },
         { lable: '五星', num: data.fiveNum, unit: '个' },
         { lable: '五星平均', num: data.fiveAvg, unit: '抽', color: data.fiveColor },
-        { lable: '五星武器', num: data.weaponNum, unit: '个' }
+        { lable: `五星${weapon}`, num: data.weaponNum, unit: '个' }
       ], [
         { lable: '未出四星', num: data.noFourNum, unit: '抽' },
         { lable: '四星', num: data.fourNum, unit: '个' },
@@ -667,12 +698,12 @@ class GachaLog extends base {
       ]]
     }
     // 武器池
-    if (this.type == 302) {
+    if ([302, 12].includes(this.type)) {
       line = [[
         { lable: '未出五星', num: data.noFiveNum, unit: '抽' },
         { lable: '五星', num: data.fiveNum, unit: '个' },
         { lable: '五星平均', num: data.fiveAvg, unit: '抽', color: data.fiveColor },
-        { lable: '四星武器', num: data.weaponFourNum, unit: '个' }
+        { lable: `四星${weapon}`, num: data.weaponFourNum, unit: '个' }
       ], [
         { lable: '未出四星', num: data.noFourNum, unit: '抽' },
         { lable: '四星', num: data.fourNum, unit: '个' },
@@ -680,7 +711,20 @@ class GachaLog extends base {
         { lable: '四星最多', num: data.maxFour.num, unit: data.maxFour.name }
       ]]
     }
-
+    // 新手池
+    if ([100, 2].includes(this.type)) {
+      line = [[
+        { lable: '未出五星', num: data.noFiveNum, unit: '抽' },
+        { lable: '五星', num: data.fiveNum, unit: '个' },
+        { lable: '五星平均', num: data.fiveAvg, unit: '抽', color: data.fiveColor },
+        { lable: `五星${weapon}`, num: data.weaponNum, unit: '个' }
+      ], [
+        { lable: '未出四星', num: data.noFourNum, unit: '抽' },
+        { lable: '四星', num: data.fourNum, unit: '个' },
+        { lable: '四星平均', num: data.fourAvg, unit: '抽' },
+        { lable: '四星最多', num: data.maxFour.num, unit: data.maxFour.name }
+      ]]
+    }
     let hasMore = false
     if (this.e.isGroup && data.fiveLog.length > 48) {
       data.fiveLog = data.fiveLog.slice(0, 48)
@@ -702,25 +746,26 @@ class GachaLog extends base {
     }
   }
 
-  getServer () {
+  getServer() {
     let uid = this.uid
     switch (String(uid)[0]) {
       case '1':
       case '2':
-        return 'cn_gf01' // 官服
+        return this.e.isSr ? 'prod_gf_cn' : 'cn_gf01' // 官服
       case '5':
-        return 'cn_qd01' // B服
+        return this.e.isSr ? 'prod_qd_cn' : 'cn_qd01' // B服
       case '6':
-        return 'os_usa' // 美服
+        return this.e.isSr ? 'prod_official_usa' : 'os_usa' // 美服
       case '7':
-        return 'os_euro' // 欧服
+        return this.e.isSr ? 'prod_official_euro' : 'os_euro' // 欧服
       case '8':
-        return 'os_asia' // 亚服
+        return this.e.isSr ? 'prod_official_asia' : 'os_asia' // 亚服
       case '9':
-        return 'os_cht' // 港澳台服
+        return this.e.isSr ? 'prod_official_cht' : 'os_cht' // 港澳台服
     }
     return 'cn_gf01'
   }
 }
 
 exports.GachaLog = GachaLog
+

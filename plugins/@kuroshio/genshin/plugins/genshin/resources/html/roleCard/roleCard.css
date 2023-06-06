@@ -1,6 +1,6 @@
 @font-face {
   font-family: "tttgbnumber";
-  src: url("../../../../../../resources/font/tttgbnumber.ttf");
+  src: url("../../../../../resources/font/tttgbnumber.ttf");
   font-weight: normal;
   font-style: normal;
 }
@@ -249,7 +249,7 @@ body {
   padding-top: 20px;
   border-radius: 10px;
   border: 1px solid #ffffff;
-}
+} 
 .data-line {
   display: flex;
   justify-content: space-around;

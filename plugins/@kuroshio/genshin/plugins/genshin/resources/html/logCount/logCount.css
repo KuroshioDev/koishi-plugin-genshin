@@ -1,6 +1,6 @@
 @font-face {
   font-family: "tttgbnumber";
-  src: url("../../../../../../resources/font/tttgbnumber.ttf");
+  src: url("../../../../../resources/font/tttgbnumber.ttf");
   font-weight: normal;
   font-style: normal;
 }
@@ -29,7 +29,7 @@ body {
   background-color: #f5f6fb;
 }
 .head_box {
-
+  
   border-radius: 15px;
   font-family: tttgbnumber;
   padding: 10px 20px;

@@ -6,11 +6,9 @@ const { MysUser } = require( './MysUser.js')
 const { DailyCache } = require( './DailyCache.js')
 const common = require('../../../lib/common/common.js')
 const { Logger} = require( "koishi")
-
-const logger = new Logger("genshin-model-mys-MysInfo")
-
+const logger = new Logger('genshin-plugin-MysInfo')
 class MysInfo {
-  static tips = '请先#绑定cookie\n发送【#扫码登录】查看配置教程'
+  static tips = '请先#绑定cookie\n发送【体力帮助】查看配置教程'
 
   constructor(e) {
     if (e) {
@@ -119,6 +117,9 @@ class MysInfo {
 
     // 消息携带UID、当前用户UID、群名片携带UID 依次获取
     uid = matchUid(msg) || user.uid || matchUid(e.sender.card)
+    if (e.isSr) {
+      uid = user._starUid
+    }
     if (!matchMsgUid) uid = user.uid
     if (uid) {
       /** 没有绑定的自动绑定 */
@@ -146,7 +147,10 @@ class MysInfo {
       if (e.noTips !== true) e.reply('尚未绑定cookie', false, { at: selfUser.qq })
       return false
     }
-
+    if(e.isSr) {
+      let targetCk = Object.keys(selfUser.ckData).filter(k => selfUser.ckData[k].isMain)
+      return selfUser.ckData[targetCk[0]].starrail_uid
+    }
     return selfUser.uid
   }
 
@@ -190,8 +194,12 @@ class MysInfo {
 
     if (!mysInfo.uid || !mysInfo.ckInfo.ck) return false
     e.uid = mysInfo.uid
+    if (e.isSr) {
+      mysInfo.uid = e.user.ckData[e.uid].starrail_uid
+      e.uid =  e.user.ckData[e.uid].starrail_uid
+    }
 
-    let mysApi = new MysApi(mysInfo.uid, mysInfo.ckInfo.ck, option)
+    let mysApi = new MysApi(mysInfo.uid, mysInfo.ckInfo.ck, option, e.isSr)
 
     let res
     if (lodash.isObject(api)) {
@@ -210,7 +218,7 @@ class MysInfo {
       }
 
       for (let i in res) {
-        res[i] = await mysInfo.checkCode(res[i], res[i].api, mysApi, mysInfo)
+        res[i] = await mysInfo.checkCode(res[i], res[i].api)
 
         if (res[i]?.retcode === 0) continue
 
@@ -218,7 +226,7 @@ class MysInfo {
       }
     } else {
       res = await mysApi.getData(api, data)
-      res = await mysInfo.checkCode(res, api, mysApi, mysInfo)
+      res = await mysInfo.checkCode(res, api, e.isSr)
     }
 
     return res
@@ -248,6 +256,7 @@ class MysInfo {
     if (this.ckInfo.ck) return this.ckInfo.ck
 
     let mysUser = await MysUser.getByQueryUid(this.uid, onlySelfCk)
+
     if (mysUser) {
       if (mysUser.ckData?.ck) {
         this.ckInfo = mysUser.ckData
@@ -329,7 +338,7 @@ class MysInfo {
     return true
   }
 
-  async checkCode(res, type, mysApi, mysInfo) {
+  async checkCode(res, type, isSr) {
     if (!res) {
       this.e.reply('米游社接口请求失败，暂时无法查询')
       return false
@@ -341,6 +350,7 @@ class MysInfo {
         res.retcode = 0
       }
     }
+
     switch (res.retcode) {
       case 0:
         break
@@ -381,7 +391,9 @@ class MysInfo {
         if (res.api === 'detail') res.retcode = 0
         break
       case 1034:
-        res = await this.geetest(type, MysInfo, mysApi)
+        logger.info(`[米游社查询失败][uid:${this.uid}][qq:${this.userId}] 遇到验证码`)
+        // this.e.reply('米游社查询遇到验证码，请稍后再试')
+        res = await this.geetest(type, isSr)
         break
       default:
         this.e.reply(`米游社接口报错，暂时无法查询：${res.message || 'error'}`)
@@ -395,12 +407,14 @@ class MysInfo {
     return res
   }
   /**
-      * @param {最后回调的接口} type
-      * @param {MysInfo} MysInfo
-      * @param {mysApi} mysApi
-      */
-  async geetest(type, MysInfo, mysApi) {
+    * @param {最后回调的接口} type
+    * @param {MysInfo} MysInfo
+    * @param {mysApi} mysApi
+    */
+  async geetest(type, isSr) {
+    let mysApi = new MysApi(this.ckInfo.uid, this.ckInfo.ck, { log: true }, isSr);
     let res;
+    let validate
     try {
       res = await mysApi.getData('createVerification');
       let gt = res?.data?.gt;
@@ -408,33 +422,19 @@ class MysInfo {
       res = await mysApi.getData('geetype', {
         gt
       });
-      //免费方案但是概率极低
-      res = await mysApi.getData('geeTestAjax', {
+      await common.sleep(300)
+      this.e.reply('米游社接口遇见验证码，请等待Bot通过验证码~')
+      res = await mysApi.getData('validate', {
         gt,
         challenge
       });
-      let validate = res?.data?.validate
-      if (!validate) {
-        res = await mysApi.getData('createVerification');
-        gt = res?.data?.gt;
-        challenge = res?.data?.challenge;
-        res = await mysApi.getData('geetype', {
-          gt
-        });
-        await common.sleep(300)
-        this.e.reply('米游社接口遇见验证码，请等待Bot通过验证码~')
-        res = await mysApi.getData('validate', {
-          gt,
-          challenge
-        });
-        if(!res){
-          this.e.reply('接口请求失败~')
-          return false;
-        }
-        challenge = res.data.challenge
-        validate = res.data.validate
-        gt = res.data.gt
+      if (!res) {
+        this.e.reply('接口请求失败~')
+        return false
       }
+      challenge = res.data.challenge
+      validate = res.data.validate
+      gt = res.data.gt
       res = await mysApi.getData('verifyVerification', {
         gt,
         challenge,
@@ -451,9 +451,11 @@ class MysInfo {
       }
     } catch (error) {
       logger.error('无感日志：' + error)
+      return false
     }
     return res
   }
+
   /** 删除失效ck */
   async delCk() {
     if (!this.ckUser) {
@@ -488,5 +490,4 @@ class MysInfo {
     return await MysUser.delDisable()
   }
 }
-
 module.exports = MysInfo

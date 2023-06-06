@@ -1,6 +1,6 @@
 @font-face {
   font-family: "tttgbnumber";
-  src: url("../../../../../../resources/font/tttgbnumber.ttf");
+  src: url("../../../../../resources/font/tttgbnumber.ttf");
   font-weight: normal;
   font-style: normal;
 }
@@ -106,10 +106,8 @@ body {
   text-align: center;
   color: #7994a7;
 }
-
 .hasMore{
   font-size: 12px;
   margin: 6px 0;
   color: #7f858a;
 }
-

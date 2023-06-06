@@ -3,10 +3,10 @@ const lodash = require( 'lodash')
 const fetch = require( 'node-fetch')
 const cfg = require( '../../../lib/config/config.js')
 const { Logger } = require( 'koishi')
+const apiTool = require("./apiTool");
 
 const logger = new Logger("genshin-model-mys-mysapi")
 let HttpsProxyAgent = ''
-let token = ''
 class MysApi {
   /**
    * @param uid 游戏uid
@@ -14,11 +14,12 @@ class MysApi {
    * @param option 其他参数
    * @param option.log 是否显示日志
    */
-  constructor(uid, cookie, option = {}) {
+  constructor(uid, cookie, option = {}, isSr = false) {
     this.uid = uid
     this.cookie = cookie
+    this.isSr = isSr
     this.server = this.getServer()
-
+    this.apiTool = new apiTool(uid, this.server, isSr)
     /** 5分钟缓存 */
     this.cacheCd = 300
 
@@ -29,151 +30,7 @@ class MysApi {
   }
 
   getUrl(type, data = {}) {
-    let host, hostRecord
-    if (['cn_gf01', 'cn_qd01'].includes(this.server)) {
-      host = 'https://api-takumi.mihoyo.com/'
-      hostRecord = 'https://api-takumi-record.mihoyo.com/'
-    } else if (['os_usa', 'os_euro', 'os_asia', 'os_cht'].includes(this.server)) {
-      host = 'https://api-os-takumi.mihoyo.com/'
-      hostRecord = 'https://bbs-api-os.mihoyo.com/'
-    }
-
-    let urlMap = {
-      /** 首页宝箱 */
-      index: {
-        url: `${hostRecord}game_record/app/genshin/api/index`,
-        query: `role_id=${this.uid}&server=${this.server}`
-      },
-      /** 深渊 */
-      spiralAbyss: {
-        url: `${hostRecord}game_record/app/genshin/api/spiralAbyss`,
-        query: `role_id=${this.uid}&schedule_type=${data.schedule_type || 1}&server=${this.server}`
-      },
-      /** 角色详情 */
-      character: {
-        url: `${hostRecord}game_record/app/genshin/api/character`,
-        body: { role_id: this.uid, server: this.server }
-      },
-      /** 树脂 */
-      dailyNote: {
-        url: `${hostRecord}game_record/app/genshin/api/dailyNote`,
-        query: `role_id=${this.uid}&server=${this.server}`
-      },
-      /** 签到信息 */
-      bbs_sign_info: {
-        url: `${host}event/bbs_sign_reward/info`,
-        query: `act_id=e202009291139501&region=${this.server}&uid=${this.uid}`,
-        sign: true
-      },
-      /** 签到奖励 */
-      bbs_sign_home: {
-        url: `${host}event/bbs_sign_reward/home`,
-        query: `act_id=e202009291139501&region=${this.server}&uid=${this.uid}`,
-        sign: true
-      },
-      /** 签到 */
-      bbs_sign: {
-        url: `${host}event/bbs_sign_reward/sign`,
-        body: { act_id: 'e202009291139501', region: this.server, uid: this.uid },
-        sign: true
-      },
-      /** 详情 */
-      detail: {
-        url: `${host}event/e20200928calculate/v1/sync/avatar/detail`,
-        query: `uid=${this.uid}&region=${this.server}&avatar_id=${data.avatar_id}`
-      },
-      /** 札记 */
-      ys_ledger: {
-        url: 'https://hk4e-api.mihoyo.com/event/ys_ledger/monthInfo',
-        query: `month=${data.month}&bind_uid=${this.uid}&bind_region=${this.server}`
-      },
-      /** 养成计算器 */
-      compute: {
-        url: `${host}event/e20200928calculate/v2/compute`,
-        body: data
-      },
-      blueprintCompute: {
-        url: `${host}event/e20200928calculate/v1/furniture/compute`,
-        body: data
-      },
-      /** 养成计算器 */
-      blueprint: {
-        url: `${host}event/e20200928calculate/v1/furniture/blueprint`,
-        query: `share_code=${data.share_code}&region=${this.server}`
-      },
-      /** 角色技能 */
-      avatarSkill: {
-        url: `${host}event/e20200928calculate/v1/avatarSkill/list`,
-        query: `avatar_id=${data.avatar_id}`
-      },
-      createVerification: {
-        url: `${hostRecord}game_record/app/card/wapi/createVerification`,
-        query: 'is_high=true'
-      },
-      geeTestAjax: {
-				url: `https://apiv6.geetest.com/ajax.php`,
-				query: `gt=${data.gt}&challenge=${data.challenge}&lang=zh-cn&pt=3&client_type=web_mobile`
-			},
-      /** 接口回调值validate、challenge*/
-      verifyVerification: {
-        url: `${hostRecord}game_record/app/card/wapi/verifyVerification`,
-        body: {
-          "geetest_challenge": data.challenge,
-          "geetest_validate": data.validate,
-          "geetest_seccode": `${data.validate}|jordan`
-        }
-      },
-      validate: {
-				url: `http://api.fuckmys.tk/geetest`,
-				query: `token=${token}&gt=${data.gt}&challenge=${data.challenge}`
-			},
-      /** 效验gt验证码 */
-      geetype: {
-        url: `https://api.geetest.com/gettype.php`,
-        query: `gt=${data.gt}`
-      },
-      /** 七圣召唤数据 */
-      basicInfo: {
-        url: `${hostRecord}game_record/app/genshin/api/gcg/basicInfo`,
-        query: `role_id=${this.uid}&server=${this.server}`
-      },
-      /**使用兑换码 目前仅限国际服,来自于国服的uid请求已在myinfo.js的init方法提前拦截 */
-      useCdk: {
-        url: 'PLACE_HOLDER',
-        query: null
-      }
-    }
-    if (this.server.startsWith('os')) {
-      urlMap.bbs_sign_info.url = 'https://hk4e-api-os.hoyoverse.com/event/sol/info'
-      urlMap.bbs_sign_info.query = `act_id=e202102251931481&region=${this.server}&uid=${this.uid}`
-
-      urlMap.bbs_sign_home.url = 'https://hk4e-api-os.hoyoverse.com/event/sol/home'
-      urlMap.bbs_sign_home.query = `act_id=e202102251931481&region=${this.server}&uid=${this.uid}`
-
-      urlMap.bbs_sign.url = 'https://hk4e-api-os.hoyoverse.com/event/sol/sign'
-      urlMap.bbs_sign.body = { act_id: 'e202102251931481', region: this.server, uid: this.uid }
-
-      urlMap.detail.url = 'https://sg-public-api.hoyolab.com/event/calculateos/sync/avatar/detail'// 角色天赋详情
-      urlMap.detail.query = `lang=zh-cn&uid=${this.uid}&region=${this.server}&avatar_id=${data.avatar_id}`
-
-      urlMap.avatarSkill.url = 'https://sg-public-api.hoyolab.com/event/calculateos/avatar/skill_list'// 查询未持有的角色天赋
-      urlMap.avatarSkill.query = `lang=zh-cn&avatar_id=${data.avatar_id}`
-
-      urlMap.compute.url = 'https://sg-public-api.hoyolab.com/event/calculateos/compute'// 已支持养成计算
-
-      urlMap.blueprint.url = 'https://sg-public-api.hoyolab.com/event/calculateos/furniture/blueprint'
-      urlMap.blueprint.query = `share_code=${data.share_code}&region=${this.server}&lang=zh-cn`
-
-      urlMap.blueprintCompute.url = 'https://sg-public-api.hoyolab.com/event/calculateos/furniture/compute'
-      urlMap.blueprintCompute.body = { lang: 'zh-cn', ...data }
-
-      urlMap.ys_ledger.url = 'https://hk4e-api-os.mihoyo.com/event/ysledgeros/month_info'// 支持了国际服札记
-      urlMap.ys_ledger.query = `lang=zh-cn&month=${data.month}&uid=${this.uid}&region=${this.server}`
-
-      urlMap.useCdk.url = 'https://sg-hk4e-api.hoyoverse.com/common/apicdkey/api/webExchangeCdkey'
-      urlMap.useCdk.query = `uid=${this.uid}&region=${this.server}&lang=zh-cn&cdkey=${data.cdk}&game_biz=hk4e_global`
-    }
-
+    let urlMap = this.apiTool.getUrlMap(data)
     if (!urlMap[type]) return false
 
     let { url, query = '', body = '', sign = '' } = urlMap[type]
@@ -191,17 +48,17 @@ class MysApi {
     switch (String(uid)[0]) {
       case '1':
       case '2':
-        return 'cn_gf01' // 官服
+        return this.isSr ? 'prod_gf_cn' : 'cn_gf01' // 官服
       case '5':
-        return 'cn_qd01' // B服
+        return this.isSr ? 'prod_qd_cn' : 'cn_qd01' // B服
       case '6':
-        return 'os_usa' // 美服
+        return this.isSr ? 'prod_official_usa' : 'os_usa' // 美服
       case '7':
-        return 'os_euro' // 欧服
+        return this.isSr ? 'prod_official_euro' : 'os_euro' // 欧服
       case '8':
-        return 'os_asia' // 亚服
+        return this.isSr ? 'prod_official_asia' : 'os_asia' // 亚服
       case '9':
-        return 'os_cht' // 港澳台服
+        return this.isSr ? 'prod_official_cht' : 'os_cht' // 港澳台服
     }
     return 'cn_gf01'
   }
@@ -227,7 +84,6 @@ class MysApi {
       agent: await this.getAgent(),
       timeout: 10000
     }
-
     if (body) {
       param.method = 'post'
       param.body = body
@@ -250,12 +106,14 @@ class MysApi {
     if (this.option.log) {
       logger.info(`[米游社接口][${type}][${this.uid}] ${Date.now() - start}ms`)
     }
-    let res=await response.text()
+    // const res = await response.json()
+    let res = await response.text()
     if (res.startsWith('(')) {
-			res = JSON.parse((res).replace(/\(|\)/g, ""))
-		} else {
-			res = JSON.parse(res)
-		}
+      res = JSON.parse((res).replace(/\(|\)/g, ""))
+    } else {
+      res = JSON.parse(res)
+    }
+
     if (!res) {
       logger.info('mys接口没有返回')
       return false
@@ -274,8 +132,8 @@ class MysApi {
 
   getHeaders(query = '', body = '', sign = false) {
     const cn = {
-      app_version: '2.37.1',
-      User_Agent: `Mozilla/5.0 (Linux; Android 12; ${this.device}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.73 Mobile Safari/537.36 miHoYoBBS/2.37.1`,
+      app_version: '2.40.1',
+      User_Agent: `Mozilla/5.0 (Linux; Android 12; ${this.device}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.73 Mobile Safari/537.36 miHoYoBBS/2.40.1`,
       client_type: 5,
       Origin: 'https://webstatic.mihoyo.com',
       X_Requested_With: 'com.mihoyo.hyperion',
@@ -322,9 +180,9 @@ class MysApi {
 
   getDs(q = '', b = '') {
     let n = ''
-    if (['cn_gf01', 'cn_qd01'].includes(this.server)) {
+    if (['cn_gf01', 'cn_qd01','prod_gf_cn','prod_qd_cn'].includes(this.server)) {
       n = 'xV8v4Qu54lUKrEYFZkJhB8cuOh9Asafs'
-    } else if (['os_usa', 'os_euro', 'os_asia', 'os_cht'].includes(this.server)) {
+    } else if (/os_|official/.test(this.server)) {
       n = 'okr4obncj8bw5a65hbnn5oo6ixjc3l9w'
     }
     let t = Math.round(new Date().getTime() / 1000)
@@ -336,7 +194,7 @@ class MysApi {
   /** 签到ds */
   getDsSign() {
     /** @Womsxd */
-    const n = 'Qqx8cyv7kuyD8fTw11SmvXSFHp7iZD29'
+    const n = 'jEpJb9rRARU2rXDA9qYbZ3selxkuct9a'
     const t = Math.round(new Date().getTime() / 1000)
     const r = lodash.sampleSize('abcdefghijklmnopqrstuvwxyz0123456789', 6).join('')
     const DS = md5(`salt=${n}&t=${t}&r=${r}`)
@@ -388,5 +246,4 @@ class MysApi {
     return null
   }
 }
-
 module.exports = MysApi

@@ -8,7 +8,7 @@
 const { DailyCache }= require( './DailyCache.js')
 const { BaseModel }= require( './BaseModel.js')
 // const { NoteUser }= require( './NoteUser.js')
-const { MysApi }= require( './mysApi.js')
+const MysApi = require( './mysApi.js')
 const lodash = require( 'lodash')
 const fetch= require( 'node-fetch')
 const { Logger } = require( 'koishi')
@@ -132,7 +132,7 @@ class MysUser extends BaseModel {
     // 根据uid检索已查询记录。包括公共CK/自己CK/已查询过
     let ret = await create(await servCache.zKey(tables.detail, uid))
     if (ret) {
-      logger.info(`[米游社查询][uid：${uid}][使用已查询ck：${ret.ltuid}]}`)
+     logger.info(`[米游社查询][uid：${uid}][使用已查询ck：${ret.ltuid}]}`)
       return ret
     }
 
@@ -142,79 +142,11 @@ class MysUser extends BaseModel {
     // 使用CK池内容，分配次数最少的一个ltuid
     ret = await create(await servCache.zMinKey(tables.detail))
     if (ret) {
-      logger.info(`[米游社查询][uid：${uid}][分配查询ck：${ret.ltuid}]}`)
+       logger.info(`[米游社查询][uid：${uid}][分配查询ck：${ret.ltuid}]}`)
       return ret
     }
 
     return false
-  }
-
-  // 为当前MysUser绑定uid
-  addUid (uid) {
-    if (lodash.isArray(uid)) {
-      for (let u of uid) {
-        this.addUid(u)
-      }
-      return true
-    }
-    uid = '' + uid
-    if (/\d{9}/.test(uid) || uid === 'pub') {
-      if (!this.uids.includes(uid)) {
-        this.uids.push(uid)
-      }
-    }
-    return true
-  }
-
-  // 初始化当前MysUser缓存记录
-  async initCache (user) {
-    if (!this.ltuid || !this.servCache || !this.ck) {
-      return
-    }
-
-    // 为当前MysUser添加uid查询记录
-    if (!lodash.isEmpty(this.uids)) {
-      for (let uid of this.uids) {
-        if (uid !== 'pub') {
-          await this.addQueryUid(uid)
-          // 添加ltuid-uid记录，用于判定ltuid绑定个数及自ltuid查询
-          await this.cache.zAdd(tables.uid, this.ltuid, uid)
-        }
-      }
-    } else {
-      logger.info(`ltuid:${this.ltuid}暂无uid信息，请检查...`)
-    }
-    // 缓存ckData，供后续缓存使用
-    // ltuid关系存储到与server无关的cache中，方便后续检索
-    if (this.ckData && this.ckData.ck) {
-      await this.cache.kSet(tables.ck, this.ltuid, this.ckData)
-    }
-
-    // 缓存qq，用于删除ltuid时查找
-    if (user && user.qq) {
-      let qq = user.qq === 'pub' ? 'pub' : user.qq * 1
-      let qqArr = await this.cache.kGet(tables.qq, this.ltuid, true)
-      if (!lodash.isArray(qqArr)) {
-        qqArr = []
-      }
-      if (!qqArr.includes(qq)) {
-        qqArr.push(qq)
-        await this.cache.kSet(tables.qq, this.ltuid, qqArr)
-      }
-    }
-
-    // 从删除记录中查找并恢复查询记录
-    let cacheSearchList = await this.servCache.get(tables.del, this.ltuid, true)
-    // 这里不直接插入，只插入当前查询记录中没有的值
-    if (cacheSearchList && cacheSearchList.length > 0) {
-      for (let searchedUid of cacheSearchList) {
-        // 检查对应uid是否有新的查询记录
-        if (!await this.getQueryLtuid(searchedUid)) {
-          await this.addQueryUid(searchedUid)
-        }
-      }
-    }
-    return true
   }
 
   static async eachServ (fn) {
@@ -234,82 +166,6 @@ class MysUser extends BaseModel {
     await cache.empty(tables.uid)
     await cache.empty(tables.ck)
     await cache.empty(tables.qq)
-  }
-
-  async disable () {
-    await this.servCache.zDel(tables.detail, this.ltuid)
-    logger.info(`[标记无效ck][ltuid:${this.ltuid}]`)
-  }
-
-  //
-  //
-  /**
-   * 删除缓存, 供User解绑CK时调用
-   * @param user
-   * @returns {Promise<boolean>}
-   */
-  async del (user) {
-    if (user && user.qq) {
-      let qqList = await this.cache.kGet(tables.qq, this.ltuid, true)
-      let newList = lodash.pull(qqList, user.qq * 1)
-      await this.cache.kSet(tables.qq, this.ltuid, newList)
-      if (newList.length > 0) {
-        // 如果数组还有其他元素，说明该ltuid还有其他绑定，不进行缓存删除
-        return false
-      }
-    }
-    // 将查询过的uid缓存起来，以备后续重新绑定时恢复
-    let uids = await this.getQueryUids()
-    await this.servCache.set(tables.del, uids)
-
-    // 标记ltuid为失效
-    await this.servCache.zDel(tables.detail, this.ltuid)
-    await this.cache.zDel(tables.uid, this.ltuid)
-    await this.cache.kDel(tables.ck, this.ltuid)
-    await this.cache.kDel(tables.qq, this.ltuid)
-    logger.info(`[删除失效ck][ltuid:${this.ltuid}]`)
-  }
-
-  // 删除MysUser用户记录，会反向删除User中的记录及绑定关系
-  async delWithUser () {
-    // 查找用户
-    // let qqArr = await this.cache.kGet(tables.qq, this.ltuid, true)
-    // if (qqArr && qqArr.length > 0) {
-    //   for (let qq of qqArr) {
-    //     //let user = await NoteUser.create(qq)
-    //     if (user) {
-    //       // 调用user删除ck
-    //       await user.delCk(this.ltuid, false)
-    //     }
-    //   }
-    // }
-    // await this.del()
-  }
-
-  // 为当前用户添加uid查询记录
-  async addQueryUid (uid) {
-    if (uid) {
-      await this.servCache.zAdd(tables.detail, this.ltuid, uid)
-    }
-  }
-
-  // 获取当前用户已查询uid列表
-  async getQueryUids () {
-    return await this.servCache.zList(tables.detail, this.ltuid)
-  }
-
-  // 根据uid获取查询ltuid
-  async getQueryLtuid (uid) {
-    return await this.servCache.zKey(tables.detail, uid)
-  }
-
-  // 检查指定uid是否为当前MysUser所有
-  async ownUid (uid) {
-    if (!uid) {
-      return false
-    }
-    let uidArr = await this.cache.zList(tables.uid, this.ltuid) || []
-    return uid && uidArr.join(',').split(',').includes(uid + '')
   }
 
   // 获取用户统计数据
@@ -371,7 +227,7 @@ class MysUser extends BaseModel {
 
   static async getGameRole (ck, serv = 'mys') {
     let url = {
-      mys: 'https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie?game_biz=hk4e_cn',
+      mys: 'https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie',
       hoyolab: 'https://api-os-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie?game_biz=hk4e_global'
     }
 
@@ -454,11 +310,11 @@ class MysUser extends BaseModel {
     }
     if (!res) return ret(msg, false)
     if (!res.data.list || res.data.list.length <= 0) {
-      return ret('该账号尚未绑定原神角色', false)
+      return ret('该账号尚未绑定原神或星穹角色', false)
     }
 
     for (let val of res.data.list) {
-      if (/\d{9}/.test(val.game_uid)) {
+      if (/\d{9}/.test(val.game_uid) && val.game_biz === 'hk4e_cn') {
         uids.push(val.game_uid + '')
       }
     }
@@ -520,6 +376,153 @@ class MysUser extends BaseModel {
       status: 0,
       msg: 'CK状态正常'
     }
+  }
+
+  // 为当前MysUser绑定uid
+  addUid (uid) {
+    if (lodash.isArray(uid)) {
+      for (let u of uid) {
+        this.addUid(u)
+      }
+      return true
+    }
+    uid = '' + uid
+    if (/\d{9}/.test(uid) || uid === 'pub') {
+      if (!this.uids.includes(uid)) {
+        this.uids.push(uid)
+      }
+    }
+    return true
+  }
+
+  // 初始化当前MysUser缓存记录
+  async initCache (user) {
+    if (!this.ltuid || !this.servCache || !this.ck) {
+      return
+    }
+
+    // 为当前MysUser添加uid查询记录
+    if (!lodash.isEmpty(this.uids)) {
+      for (let uid of this.uids) {
+        if (uid !== 'pub') {
+          await this.addQueryUid(uid)
+          // 添加ltuid-uid记录，用于判定ltuid绑定个数及自ltuid查询
+          await this.cache.zAdd(tables.uid, this.ltuid, uid)
+        }
+      }
+    } else {
+      console.log(`ltuid:${this.ltuid}暂无uid信息，请检查...`)
+      // 公共ck暂无uid信息不添加
+      if (user?.qq === 'pub') {
+        return false
+      }
+    }
+    // 缓存ckData，供后续缓存使用
+    // ltuid关系存储到与server无关的cache中，方便后续检索
+    if (this.ckData && this.ckData.ck) {
+      await this.cache.kSet(tables.ck, this.ltuid, this.ckData)
+    }
+
+    // 缓存qq，用于删除ltuid时查找
+    if (user && user.qq) {
+      let qq = user.qq === 'pub' ? 'pub' : user.qq * 1
+      let qqArr = await this.cache.kGet(tables.qq, this.ltuid, true)
+      if (!lodash.isArray(qqArr)) {
+        qqArr = []
+      }
+      if (!qqArr.includes(qq)) {
+        qqArr.push(qq)
+        await this.cache.kSet(tables.qq, this.ltuid, qqArr)
+      }
+    }
+
+    // 从删除记录中查找并恢复查询记录
+    let cacheSearchList = await this.servCache.get(tables.del, this.ltuid, true)
+    // 这里不直接插入，只插入当前查询记录中没有的值
+    if (cacheSearchList && cacheSearchList.length > 0) {
+      for (let searchedUid of cacheSearchList) {
+        // 检查对应uid是否有新的查询记录
+        if (!await this.getQueryLtuid(searchedUid)) {
+          await this.addQueryUid(searchedUid)
+        }
+      }
+    }
+    return true
+  }
+
+  async disable () {
+    await this.servCache.zDel(tables.detail, this.ltuid)
+    logger.info(`[标记无效ck][ltuid:${this.ltuid}]`)
+  }
+
+  //
+  /**
+   * 删除缓存, 供User解绑CK时调用
+   * @param user
+   * @returns {Promise<boolean>}
+   */
+  async del (user) {
+    if (user && user.qq) {
+      let qqList = await this.cache.kGet(tables.qq, this.ltuid, true)
+      let newList = lodash.pull(qqList, user.qq * 1)
+      await this.cache.kSet(tables.qq, this.ltuid, newList)
+      if (newList.length > 0) {
+        // 如果数组还有其他元素，说明该ltuid还有其他绑定，不进行缓存删除
+        return false
+      }
+    }
+    // 将查询过的uid缓存起来，以备后续重新绑定时恢复
+    let uids = await this.getQueryUids()
+    await this.servCache.set(tables.del, uids)
+
+    // 标记ltuid为失效
+    await this.servCache.zDel(tables.detail, this.ltuid)
+    await this.cache.zDel(tables.uid, this.ltuid)
+    await this.cache.kDel(tables.ck, this.ltuid)
+    await this.cache.kDel(tables.qq, this.ltuid)
+    logger.info(`[删除失效ck][ltuid:${this.ltuid}]`)
+  }
+
+  // 删除MysUser用户记录，会反向删除User中的记录及绑定关系
+  async delWithUser () {
+    // 查找用户
+    let qqArr = await this.cache.kGet(tables.qq, this.ltuid, true)
+    if (qqArr && qqArr.length > 0) {
+      for (let qq of qqArr) {
+        // let user = await NoteUser.create(qq)
+        // if (user) {
+        //   // 调用user删除ck
+        //   await user.delCk(this.ltuid, false)
+        // }
+      }
+    }
+    await this.del()
+  }
+
+  // 为当前用户添加uid查询记录
+  async addQueryUid (uid) {
+    if (uid) {
+      await this.servCache.zAdd(tables.detail, this.ltuid, uid)
+    }
+  }
+
+  // 获取当前用户已查询uid列表
+  async getQueryUids () {
+    return await this.servCache.zList(tables.detail, this.ltuid)
+  }
+
+  // 根据uid获取查询ltuid
+  async getQueryLtuid (uid) {
+    return await this.servCache.zKey(tables.detail, uid)
+  }
+
+  // 检查指定uid是否为当前MysUser所有
+  async ownUid (uid) {
+    if (!uid) {
+      return false
+    }
+    let uidArr = await this.cache.zList(tables.uid, this.ltuid) || []
+    return uid && uidArr.join(',').split(',').includes(uid + '')
   }
 }
 

@@ -9,9 +9,7 @@ const { BaseModel }= require( './BaseModel.js')
 const lodash = require( 'lodash')
 const { MysUser } = require( './MysUser.js')
 const gsCfg= require( '../gsCfg.js')
-const { Logger } = require( 'koishi')
 
-const logger = new Logger()
 class NoteUser extends BaseModel {
   constructor () {
     super()
@@ -89,6 +87,10 @@ class NoteUser extends BaseModel {
     return this._regUid || ''
   }
 
+  get starUid() {
+    return this._starUid || ''
+  }
+
   /**
    * 当前用户是否具备CK
    */
@@ -103,7 +105,15 @@ class NoteUser extends BaseModel {
     if (!this.hasCk) {
       return []
     }
-    return lodash.map(this.ckData, 'uid')
+    let result = []
+    for (let key in this.ckData) {
+      if(this.ckData[key].uid) {
+        result.push(this.ckData[key].uid)
+      }else if (this.ckData[key].starrail_uid) {
+        result.push(this.ckData[key].starrail_uid)
+      }
+    }
+    return result
   }
 
   /**
@@ -146,13 +156,17 @@ class NoteUser extends BaseModel {
    * 主要供内部调用，建议使用 user.uid 获取用户uid
    * @returns {Promise<*>}
    */
-  async getRegUid () {
-    let redisKey = `Yz:genshin:mys:qq-uid:${this.qq}`
+  async getRegUid (redisKey = `Yz:genshin:mys:qq-uid:${this.qq}`) {
     let uid = await redis.get(redisKey)
     if (uid) {
       await redis.setEx(redisKey, 3600 * 24 * 30, uid)
     }
     this._regUid = uid
+    if (this.ckData[uid] && this.ckData[uid].starrail_uid){
+      this._starUid = this.ckData[uid]?.starrail_uid
+    }else {
+      this._starUid = await redis.get(`Yz:srJson:mys:qq-uid:${this.qq}`)
+    }
     return this._regUid
   }
 
@@ -187,7 +201,7 @@ class NoteUser extends BaseModel {
     uid = (uid || this.uid) * 1
     // 设置主uid
     lodash.forEach(this.ckData, (ck) => {
-      ck.isMain = ck.uid * 1 === uid * 1
+      ck.isMain = ck.uid * 1 === uid * 1 || ck.starrail_uid * 1 === uid * 1
     })
     // 保存CK数据
     this._saveCkData()
@@ -249,6 +263,7 @@ class NoteUser extends BaseModel {
     }
     // 刷新主ck并保存ckData
     await this.setMainUid()
+
     // 刷新MysUser缓存
     if (needRefreshCache) {
       let ckUser = await MysUser.create(ltuid)

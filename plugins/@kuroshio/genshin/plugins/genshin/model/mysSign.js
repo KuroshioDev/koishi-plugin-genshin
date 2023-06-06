@@ -7,9 +7,9 @@ const User = require( './user.js')
 const common = require('../../lib/common/common.js')
 const cfg = require( '../../lib/config/config.js')
 const {Logger} = require( "koishi")
-
+const fetch = require('node-fetch')
+const logger = new Logger('genshin-plugin-MysSign')
 let signing = false
-const logger = new Logger("genshin-model-MysSign")
 class MysSign extends base {
   constructor(e) {
     super(e)
@@ -38,18 +38,15 @@ class MysSign extends base {
       return false
     }
 
-    let uids = lodash.map(ck, 'uid')
-
-    if (uids.length > 1) {
+    if (Object.keys(ck).length > 1) {
       await e.reply('多账号签到中...')
     }
-
+    let i = 0
     let msg = []
-
-    for (let i in uids) {
+    for (let key in ck) {
       mysSign.ckNum = Number(i) + 1
-      if (i >= 1) await common.sleep(5000)
-      let uid = uids[i]
+      if (Object.keys(ck).length >= 1) await common.sleep(5000)
+      let uid = key
       let res = await mysSign.doSign(ck[uid])
       if (res) msg.push(res.msg)
     }
@@ -60,8 +57,15 @@ class MysSign extends base {
   }
 
   async doSign(ck, isLog = true) {
+    if ( ck.region_name =="星穹铁道") {
+      ck.uid = ck.starrail_uid
+      this.isSr = true
+    }else {
+      this.isSr = false
+    }
+
     ck = this.setCk(ck)
-    this.mysApi = new MysApi(ck.uid, ck.ck, { log: isLog, device_id: ck.device_id })
+    this.mysApi = new MysApi(ck.uid, ck.ck, { log: isLog, device_id: ck.device_id }, this.isSr)
     this.key = `${this.prefix}isSign:${this.mysApi.uid}`
     this.log = `[uid:${ck.uid}][qq:${lodash.padEnd(this.e.user_id, 10, ' ')}]`
 
@@ -70,13 +74,14 @@ class MysSign extends base {
       let reward = await this.getReward(isSigned)
       return {
         retcode: 0,
-        msg: `uid:${ck.uid}，今天已签到\n第${isSigned}天奖励：${reward}`,
+        msg: `${ck.region_name}\nuid:${ck.uid}，今天已签到\n第${isSigned}天奖励：${reward}`,
         is_sign: true
       }
     }
 
     /** 判断是否已经签到 */
     let signInfo = await this.mysApi.getData('bbs_sign_info')
+
     await common.sleep(100)
 
     if (!signInfo) return false
@@ -89,7 +94,7 @@ class MysSign extends base {
       }
       return {
         retcode: -100,
-        msg: `签到失败，uid:${ck.uid}，绑定cookie已失效`,
+        msg: `签到失败，${ck.region_name}\nuid:${ck.uid}，绑定cookie已失效`,
         is_invalid: true
       }
     }
@@ -111,18 +116,18 @@ class MysSign extends base {
     this.signInfo = signInfo.data
 
     if (this.signInfo.is_sign && !this.force) {
-      // logger.info(`[原神已签到][uid:${this.mysApi.uid}][qq:${lodash.padEnd(this.e.user_id,11,' ')}]`)
+      // logger.mark(`[原神已签到][uid:${this.mysApi.uid}][qq:${lodash.padEnd(this.e.user_id,11,' ')}]`)
       let reward = await this.getReward(this.signInfo.total_sign_day)
       this.setCache(this.signInfo.total_sign_day)
       return {
         retcode: 0,
-        msg: `uid:${ck.uid}，今天已签到\n第${this.signInfo.total_sign_day}天奖励：${reward}`,
+        msg: `${ck.region_name}\nuid:${ck.uid}，今天已签到\n第${this.signInfo.total_sign_day}天奖励：${reward}`,
         is_sign: true
       }
     }
 
     /** 签到 */
-    let res = await this.bbsSign()
+    let res = await this.bbsSign(this.isSr)
 
     if (res) {
       let totalSignDay = this.signInfo.total_sign_day
@@ -142,13 +147,13 @@ class MysSign extends base {
 
       return {
         retcode: 0,
-        msg: `uid:${ck.uid}，${tips}\n第${totalSignDay}天奖励：${reward}`
+        msg: `${ck.region_name}\nuid:${ck.uid}，${tips}\n第${totalSignDay}天奖励：${reward}`
       }
     }
 
     return {
       retcode: -1000,
-      msg: `uid:${ck.uid}，签到失败：${this.signMsg}`
+      msg: `${ck.region_name}\nuid:${ck.uid}，签到失败：${this.signMsg}`
     }
   }
 
@@ -160,6 +165,7 @@ class MysSign extends base {
   // 缓存签到奖励
   async getReward(signDay) {
     let key = `${this.prefix}reward`
+    if (this.isSr) key = `Yz:StarRail:StarRail:reward`
     let reward = await redis.get(key)
 
     if (reward) {
@@ -188,10 +194,15 @@ class MysSign extends base {
     return reward
   }
 
-  async bbsSign() {
+  async bbsSign(isSr) {
     this.signApi = true
     this.is_verify = false
-    let sign = await this.mysApi.getData('bbs_sign')
+    let sign
+    if (isSr) {
+      sign = await this.mysApi.getData('bh_sign')
+    } else {
+      sign = await this.mysApi.getData('bbs_sign')
+    }
     this.signMsg = sign?.message ?? 'Too Many Requests'
 
     if (!sign) {
@@ -220,8 +231,8 @@ class MysSign extends base {
         this.e?.reply("遇见验证码正在尝试绕过，请稍等....")
       }
       await common.sleep(5000)
-      let res = await this.mysApi.getData('validate', sign.data)
       try {
+        let res = await this.mysApi.getData('validate', sign.data)
         let challenge = res?.data["challenge"]
         let validate = res?.data?.validate
         if (validate) {
@@ -245,8 +256,56 @@ class MysSign extends base {
         }
       } catch (error) {
         logger.error('签到异常：' + error)
-        await this.bbsSign()
+        // 尝试手动过码
+        let msg = [
+          "无法绕过验证码,请打开链接自行验证"
+        ];
+        await common.sleep(500);
+        this.e.reply(msg);
+        /** 调用手动验证码 */
+        let res = await this.crack_geetest(sign.data.gt, sign.data.challenge);
+        logger.info(`验证结果：${JSON.stringify(res)}`);
+        /** 发送验证结果 */
+        if (res?.data?.validate) {
+          let validate = res["data"]["validate"];
+          let header = {};
+          header["x-rpc-challenge"] = res["data"]["challenge"];
+          header["x-rpc-validate"] = validate;
+          header["x-rpc-seccode"] = `${validate}|jordan`;
+          let data = {
+            headers: header,
+          };
+          console.log("验证码签到");
+          sign = await this.mysApi.getData("bbs_sign", data);
+          if (sign.data && sign.data.risk_code === 375) {
+            logger.info(
+              `[原神签到失败]${this.log}：${sign.message} 第${this.ckNum}个`
+            );
+            await this.bbsSign(this.isSr);
+            return false;
+          } else {
+            this.is_verify = false;
+            this.signMsg = "验证码成功";
+            logger.info(
+              `[原神签到成功]${this.log}:验证码成功 第${this.ckNum}个`
+            );
+            return true;
+          }
+        } else if (res.msg === "识别失败") {
+          logger.info(
+            `[原神签到失败]${this.log}：${sign.message} 第${this.ckNum}个`
+          );
+          await this.bbsSign(this.isSr);
+          //return false
+        } else {
+          logger.info(
+            `[原神签到失败]${this.log}：${sign.message} 第${this.ckNum}个`
+          );
+          return false;
+        }
+        //await this.bbsSign()
       }
+
       logger.info(`[原神签到失败]${this.log}：${sign.message} 第${this.ckNum}个`)
       return false
     }
@@ -313,6 +372,7 @@ class MysSign extends base {
     let invalidNum = 0
     let verifyNum = 0
     let contiNum = 0
+    let failSignCount = 5
 
     for (let i in uids) {
       this.ckNum = Number(i) + 1
@@ -343,9 +403,14 @@ class MysSign extends base {
           failNum++
         }
       }
-      if (contiNum >= 5) {
-        break
+
+      if (this.cfg.failSignCountCfg > 0) {
+        failSignCount = this.cfg.failSignCountCfg
+        if (contiNum >= failSignCount) {
+          break
+        }
       }
+
       if (this.signApi) {
         await common.sleep(6.1 * 1000)
         this.signApi = false
@@ -356,8 +421,11 @@ class MysSign extends base {
     if (invalidNum > 0) {
       msg += `\n失效：${invalidNum}个`
     }
-    if (contiNum >= 5) {
-      msg += '\n\n验证码失败次数过多，已停止任务'
+
+    if (this.cfg.failSignCountCfg > 0) {
+      if (contiNum >= failSignCount) {
+        msg += '\n\n签到失败次数过多，已停止自动签到任务'
+      }
     }
 
     if (manual) {
@@ -429,6 +497,41 @@ class MysSign extends base {
       msg += '\n每天将为你自动签到~'
     }
     await this.e.reply(msg)
+  }
+  /** 手动过验证 */
+  async crack_geetest(gt, challenge) {
+    let url = `http://url.charlotte.ac.cn`
+    let gethtml = await fetch(url, {
+      headers: {
+        'Content-type': 'application/x-www-form-urlencoded',
+      },
+      body: `inturl=https%3A%2F%2Fapi.charlotte.ac.cn/manual_geetest?gt=${gt}%26challenge=${challenge}&outurl=&operat=inturl`,
+      method: 'post'
+    })
+    let text = await gethtml.text();
+    let match = text.match(/<input type="text" value="+\S+" disabled="disabled">/g)
+    let shorturl = match.toString().replace(/<input type="text" value="|" disabled="disabled">/g, "")
+    let tohttps = shorturl.replace(/http/g, "https")
+    await this.e.reply(`请尽快完成验证：${tohttps}`, false, {
+      at: true
+    })
+    let res;
+    for (let n = 1; n < 60; n++) {
+      await common.sleep(5000)
+      try {
+        res = await fetch(`https://api.charlotte.ac.cn/callback?challenge=${challenge}`)
+        res = await res.json()
+        if (res.data) {
+          return res
+        }
+      } catch (err) {
+        logger.error(`验证码签到 错误：${logger.red(err)}`)
+      }
+    }
+    await this.e.reply("验证超时", false, {
+      at: true
+    })
+    return false
   }
 }
 
