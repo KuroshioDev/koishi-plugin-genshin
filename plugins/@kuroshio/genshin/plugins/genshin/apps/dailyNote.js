@@ -15,7 +15,7 @@ class dailyNote extends plugin {
       priority: 300,
       rule: [
         {
-          reg: '^#*(体力|树脂|查询体力)$',
+          reg: '^#*(原神|星铁)?(体力|树脂|查询体力)$',
           fnc: 'note'
         },
         {
@@ -37,17 +37,11 @@ class dailyNote extends plugin {
     })
 
     this.set = gsCfg.getConfig('mys', 'set')
-
-    /** 定时任务 */
-    // this.task = {
-    //   cron: this.set.signTime,
-    //   name: '米游社原神签到任务',
-    //   fnc: () => this.signTask()
-    // }
   }
 
   /** #体力 */
   async note () {
+    this.e.isSr = true
     let data = await Note.get(this.e)
     if (!data) return
 
@@ -74,3 +68,4 @@ class dailyNote extends plugin {
 }
 
 module.exports = dailyNote
+

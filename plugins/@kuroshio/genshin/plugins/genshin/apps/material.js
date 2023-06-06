@@ -1,4 +1,3 @@
-/** 导入plugin */
 const plugin = require( '../../lib/plugins/plugin.js')
 const common= require( "../../lib/common/common.js")
 const gsCfg  = require( '../model/gsCfg.js')
@@ -111,6 +110,7 @@ class material extends plugin {
       return false
     }
 
+
     logger.info(`${this.e.logFnc} 下载${name}素材图`)
 
     if (!await common.downFile(url + this.oss, this.imgPath)) {
@@ -141,6 +141,7 @@ class material extends plugin {
     if (!url) {
       return false
     }
+
 
     logger.info(`${this.e.logFnc} 下载${name}素材图`)
 

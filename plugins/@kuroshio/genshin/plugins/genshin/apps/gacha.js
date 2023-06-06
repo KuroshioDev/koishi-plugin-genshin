@@ -1,12 +1,11 @@
-/** 导入plugin */
 const plugin = require( '../../lib/plugins/plugin.js')
 const puppeteer = require( '../../lib/puppeteer/puppeteer.js')
-const { GachaData } = require( '../model/gachaData.js')
+const GachaData = require( '../model/gachaData.js')
 const fs  = require( 'node:fs')
 const lodash = require( 'lodash')
 
 class gacha extends plugin {
-  constructor () {
+  constructor (ctx,session) {
     super({
       name: '十连',
       dsc: '模拟抽卡，每天十连一次，四点更新',
@@ -21,7 +20,9 @@ class gacha extends plugin {
           reg: '(^#*定轨|^#定轨(.*))$',
           fnc: 'weaponBing'
         }
-      ]
+      ],
+      ctx: ctx,
+      session: session
     })
   }
 
@@ -131,3 +132,4 @@ class gacha extends plugin {
 }
 
 module.exports = gacha
+

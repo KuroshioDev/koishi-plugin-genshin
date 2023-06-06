@@ -48,12 +48,10 @@ class calculator extends plugin {
 	  let role = this.e.msg.replace(/#/,'').match(/\d+/g);
 	  let data = await new blueprint(this.e).get(role)
 	  if (!data) return
-
 	  /** 生成图片 */
 	  let img = await puppeteer.screenshot('Blueprint', data)
 	  if (img) await this.reply(img)
   }
-
   /** #刻晴养成 */
   async Calculator () {
     let role = gsCfg.getRole(this.e.msg, '#|＃|养成|计算|[0-9]|,|，| ')
@@ -63,7 +61,6 @@ class calculator extends plugin {
       await this.e.reply('暂不支持旅行者养成计算')
       return true
     }
-
     let data = await new cal(this.e).get(role)
     if (!data) return
 
@@ -72,5 +69,4 @@ class calculator extends plugin {
     if (img) await this.reply(img)
   }
 }
-
 module.exports = calculator

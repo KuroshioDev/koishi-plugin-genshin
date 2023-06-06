@@ -118,7 +118,10 @@ class payLog extends plugin {
   /** 更新充值统计 */
   async updatePayLog (e) {
     // 读一下uid
-    let uid = await this.isMain(this.e.user_id)
+    let uid = await redis.get(`Yz:genshin:mys:qq-uid:${this.e.user_id}`)
+    if (!uid) {
+      uid = await this.isMain(this.e.user_id)
+    }
     if (uid) {
       let mainUid = await this.isMain(this.e.user_id)
       if (mainUid) uid = mainUid
@@ -186,3 +189,4 @@ class payLog extends plugin {
 }
 
 module.exports = payLog
+

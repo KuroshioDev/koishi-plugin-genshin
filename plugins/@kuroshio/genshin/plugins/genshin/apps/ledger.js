@@ -77,6 +77,7 @@ class ledger extends plugin {
     let img = await puppeteer.screenshot('ledgerCount', data)
     if (img) await this.reply(img)
   }
+
   async ledgerCountHistory () {
     let data = await new Ledger(this.e).ledgerCountHistory()
     if (!data) return
@@ -88,3 +89,4 @@ class ledger extends plugin {
 }
 
 module.exports = ledger
+
