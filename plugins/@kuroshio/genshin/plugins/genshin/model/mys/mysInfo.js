@@ -392,7 +392,7 @@ class MysInfo {
         break
       case 1034:
         logger.info(`[米游社查询失败][uid:${this.uid}][qq:${this.userId}] 遇到验证码`)
-        // this.e.reply('米游社查询遇到验证码，请稍后再试')
+        await this.e.reply('米游社查询遇到验证码，请稍后再试')
         res = await this.geetest(type, isSr)
         break
       default:
@@ -412,7 +412,7 @@ class MysInfo {
     * @param {mysApi} mysApi
     */
   async geetest(type, isSr) {
-    let mysApi = new MysApi(this.ckInfo.uid, this.ckInfo.ck, { log: true }, isSr);
+    let mysApi = new MysApi(this.uid, this.ckInfo.ck, { log: true }, isSr);
     let res;
     let validate
     try {
@@ -429,7 +429,7 @@ class MysInfo {
         challenge
       });
       if (!res) {
-        this.e.reply('接口请求失败~')
+        await this.e.reply('接口请求失败~')
         return false
       }
       challenge = res.data.challenge
@@ -446,10 +446,11 @@ class MysInfo {
           "x-rpc-challenge": challenge
         })
         if (res.retcode == 1034) {
-          this.e.reply('米游社接口遇见验证码，请上米游社通过验证码')
+          await this.e.reply('米游社接口遇见验证码，请上米游社通过验证码')
         }
       }
     } catch (error) {
+      logger.log(error)
       logger.error('无感日志：' + error)
       return false
     }
