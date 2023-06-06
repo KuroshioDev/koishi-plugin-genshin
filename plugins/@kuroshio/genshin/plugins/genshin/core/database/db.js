@@ -3,6 +3,7 @@ module.exports =  function initDB(ctx){
     // 各字段类型
     id: 'unsigned',
     uid: 'string',
+    starrail_uid: 'string',
     qq: 'string',
     ck: 'string',
     device_id: 'string',

@@ -13,6 +13,7 @@ const materialApp = require( './entrace/material.js')
 const gcLogApp = require( './entrace/gcLog.js')
 const exchangeApp = require( './entrace/exchange.js')
 const calculatorApp = require( './entrace/calculator.js')
+const gachaApp = require( './entrace/gc.js')
 const { Logger } = require( 'koishi')
 const YAML = require("yaml");
 const fs = require("fs");
@@ -44,6 +45,7 @@ class GenshinPlugin {
       new gcLogApp(this.apps, ctx, config)
       new exchangeApp(this.apps, ctx, config)
       new calculatorApp(this.apps, ctx, config)
+      new gachaApp(this.apps, ctx, config)
     })
   }
 }
