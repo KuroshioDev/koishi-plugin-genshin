@@ -198,11 +198,7 @@ class MysSign extends base {
     this.signApi = true
     this.is_verify = false
     let sign
-    if (isSr) {
-      sign = await this.mysApi.getData('bh_sign')
-    } else {
-      sign = await this.mysApi.getData('bbs_sign')
-    }
+    sign = await this.mysApi.getData('bbs_sign')
     this.signMsg = sign?.message ?? 'Too Many Requests'
 
     if (!sign) {
