@@ -2,9 +2,9 @@
   <a href="https://gitee.com/KuroshioDev/koishi-plugin-genshin">
     <img width="150" src="https://gitee.com/KuroshioDev/koishi-plugin-genshin/raw/master/ghost.png"> :heavy_multiplication_x:
 </a>
-<img width="150" src="https://koishi.chat/logo.png"> 
+<img width="150" src="https://koishi.chat/logo.png">
  :heavy_multiplication_x:
-<img width="130" src="https://gitee.com/KuroshioDev/koishi-plugin-genshin/raw/master/yunzai.png"> 
+<img width="130" src="https://gitee.com/KuroshioDev/koishi-plugin-genshin/raw/master/yunzai.png">
 </p>
 
 <h1 align="center">koishi-plugin-genshin</h1>
@@ -24,6 +24,8 @@
 - [x] example 插件
 - [x] [csv-逍遥插件](https://github.com/KuroshioDev/kuroshio-xiaoyao-plugin)
 - [x] [喵喵插件](https://github.com/KuroshioDev/kuroshio-miao-plugin)
+- [x] [图鉴插件](https://github.com/KuroshioDev/atlas-plugin)
+- [x] [星铁插件](https://github.com/KuroshioDev/kuroshio-starrail-plugin)
 
 
 
