@@ -450,7 +450,7 @@ class MysInfo {
         }
       }
     } catch (error) {
-      logger.log(error)
+      logger.info(error)
       logger.error('无感日志：' + error)
       return false
     }
