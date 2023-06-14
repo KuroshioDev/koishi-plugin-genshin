@@ -1,6 +1,7 @@
 port: 5140
 maxPort: 5149
 plugins:
+  config: {}
   group:basic:
     help: {}
     rate-limit: {}
@@ -36,8 +37,9 @@ plugins:
     ~adapter-kook: {}
     ~adapter-feishu: {}
     gocqhttp: {}
-  '~@kuroshio/genshin': {}
+  '@kuroshio/genshin': {}
   group:develop:
     hmr:
       $if: env.KOISHI_WATCH_ROOT
       root: ${{ env.KOISHI_WATCH_ROOT }}
+  live2d:9tdqsn: {}
