@@ -13,7 +13,6 @@ class Example extends plugin {
     if (!msg) {
       return false
     }
-    console.log(apps)
     msg = msg.replace(/#|＃/, '#').trim()
     for (let app in apps.rule) {
       let cfg = apps.rule[app]

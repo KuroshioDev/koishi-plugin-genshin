@@ -7,10 +7,10 @@ class ExamplePlugin {
       this.apps = await init()
     })
 
-    // ctx.middleware(async (session, next) => {
-    //     await new myContext(ctx, session).dispatch(this.apps)
-    //     return next()
-    // })
+    ctx.middleware(async (session, next) => {
+        await new myContext(ctx, session).dispatch(this.apps)
+        return next()
+    })
   }
 }
 exports.default = ExamplePlugin
