@@ -1,7 +1,4 @@
 <p align="center">
-  <a href="https://gitee.com/KuroshioDev/koishi-plugin-genshin">
-    <img width="150" src="https://gitee.com/KuroshioDev/koishi-plugin-genshin/raw/master/ghost.png"> :heavy_multiplication_x:
-</a>
 <img width="150" src="https://koishi.chat/logo.png">
  :heavy_multiplication_x:
 <img width="130" src="https://gitee.com/KuroshioDev/koishi-plugin-genshin/raw/master/yunzai.png">
@@ -73,6 +70,142 @@ ubuntu下
 
     <img src="https://github.com/KuroshioDev/koishi-plugin-genshin/blob/develop/%E6%95%99%E7%A8%8B.png?raw=true">
 
+## 🌈 迁移云仔/喵仔插件
+
+1. 首先这里有个一个js插件
+```js
+import { segment } from "oicq";
+import fetch from "node-fetch";
+//项目路径
+const _path = process.cwd();
+
+let siliao = true  //是否允许私聊使用，设为false则禁止私聊（主任除外）
+let urls = []
+
+
+
+
+export class example extends plugin {
+  constructor () {
+    super({
+      /** 功能名称 */
+      name: '可爱一下',
+      /** 功能描述 */
+      dsc: '可爱一下',
+      /** https://oicqjs.github.io/oicq/#events */
+      event: 'message',
+      /** 优先级，数字越小等级越高 */
+      priority: 5000,
+      rule: [
+        {
+           reg: "^#*可爱一下(.*)$", //匹配消息正则，命令正则
+    fnc: 'keaiyixia'
+        }
+      ]
+    })
+  }
+async  keaiyixia(e) {
+  if (urls.length == 0) {
+       await this.downimgs()
+  }
+  e.reply(segment.image(urls.pop()));
+  return true;//返回true 阻挡消息不再往下
+}
+
+async downimgs() {
+  await fetch("https://iw233.cn/api.php?type=json&num=20&sort=random", {
+    headers: { 'content-type': 'application/json'},
+    method: 'GET',
+    mode: 'cors',
+  }).then(response => response.json()).then(data => {
+    if (data.pic.length == 20) {
+      urls = data.pic
+    }
+
+  })
+  console.log('访问成功了')
+}
+}
+```
+2. 第一步
+将import .. from .. 换成 const ... = require(...)
+比如例子里面的
+```
+import { segment } from "oicq";
+import fetch from "node-fetch";
+```
+换成
+```
+const { segment } = require("oicq")
+const fetch = require("node-fetch")
+# 增加一行
+const plugin = require('../../lib/plugins/plugin')
+```
+
+3. 第二步
+删除 类前面的export 或者 export default 然后加入ctx和session参数到构造函数
+比如例子里面的
+```
+
+export class example extends plugin {
+  constructor () {
+    super({
+      /** 功能名称 */
+      name: '可爱一下',
+      /** 功能描述 */
+      dsc: '可爱一下',
+      /** https://oicqjs.github.io/oicq/#events */
+      event: 'message',
+      /** 优先级，数字越小等级越高 */
+      priority: 5000,
+      rule: [
+        {
+           reg: "^#*可爱一下(.*)$", //匹配消息正则，命令正则
+    fnc: 'keaiyixia'
+        }
+      ]
+    })
+  }
+```
+改成
+```
+class example extends plugin {
+    constructor (ctx,session) {
+    super({
+      /** 功能名称 */
+      name: '可爱一下',
+      /** 功能描述 */
+      dsc: '可爱一下',
+      /** https://oicqjs.github.io/oicq/#events */
+      event: 'message',
+      /** 优先级，数字越小等级越高 */
+      priority: 5000,
+      rule: [
+        {
+           reg: "^#*可爱一下(.*)$", //匹配消息正则，命令正则
+    fnc: 'keaiyixia'
+        }
+      ],
+      ctx:ctx,
+      session:session
+    })
+  }
+```
+4. 第三步
+文件夹末尾,增加一个匹配规则和匹配成功后执行的函数
+```
+exports.app = keai
+exports.rule = [
+  {
+    reg: '^#*可爱一下(.*)$',
+    fnc: "keaiyixia"
+  }
+]
+```
+5. 第四步，把js扔进example插件下的apps目录
+
+
+
 ## 🌈 其他
 
 - 素材来源于网络，仅供交流学习使用
@@ -83,9 +216,6 @@ ubuntu下
 
 ## 🔗 链接
 
-| 开发群 | QQ频道 | Discord | Telegram | 爱发电 |
-|-----|------|---------|----------|-----|
-|  <img width="200" src="https://gitee.com/KuroshioDev/koishi-plugin-genshin/raw/master/dev.jpg">   |  <img width="200" src="https://gitee.com/KuroshioDev/koishi-plugin-genshin/raw/master/qqguild.jpg">    |  https://discord.gg/uJpcadmrpa       |   <img width="200" src="https://github.com/KuroshioDev/koishi-plugin-genshin/blob/develop/telegram.jpg?raw=true">       |  <img width="200" src="https://gitee.com/KuroshioDev/koishi-plugin-genshin/raw/master/love.jpeg">   |
 
 
 
