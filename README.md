@@ -85,7 +85,7 @@ let urls = []
 
 
 
-export class example extends plugin {
+export class keai extends plugin {
   constructor () {
     super({
       /** 功能名称 */
@@ -147,7 +147,7 @@ const plugin = require('../../lib/plugins/plugin')
 比如例子里面的
 ```
 
-export class example extends plugin {
+export class keai extends plugin {
   constructor () {
     super({
       /** 功能名称 */
@@ -169,7 +169,7 @@ export class example extends plugin {
 ```
 改成
 ```
-class example extends plugin {
+class keai extends plugin {
     constructor (ctx,session) {
     super({
       /** 功能名称 */
