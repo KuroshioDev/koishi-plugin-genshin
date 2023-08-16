@@ -41,7 +41,7 @@
                 <img class="item-character-img" src="{{pluResPath}}img/gacha/character/{{$value.imgFile}}"/>
               </div>
             {{/if}}
-
+            
             {{if $value.star==5 && nowFive < 4 && !$value.have }}
             <div class="times">「{{$value.num}}抽」</div>
             {{/if}}
@@ -53,18 +53,18 @@
                 <img class="item-starGold" src="{{pluResPath}}img/gacha/items/星尘紫.png" />
                 <img class="item-starlight" src="{{pluResPath}}img/gacha/items/星辉2.png" />
               {{/if}}
-            {{else}}
+            {{else}} 
               {{if $value.element }}
                 <img class="item-element"  src="{{pluResPath}}img/gacha/items/{{$value.element}}.png"/>
               {{/if}}
               {{if $value.star }}
                 <img class="item-star" src="{{pluResPath}}img/gacha/items/s-{{$value.star}}.png"/>
-              {{/if}}
+              {{/if}} 
             {{/if}}
           </div>
         {{/each}}
       </div>
-      <div class="logo">Created By Koishi & 愚人众|原神</div>
+      <div class="logo">Created By Yunzai-Bot</div>
     </div>
   </body>
   <svg viewBox="0 0 302.22 1333.94" height="0" width="0">
